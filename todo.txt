@@ -1,0 +1,50 @@
+
+
+1. update check:
+
+copy all original files in orgfiles and build a script to check if core files changed and warn for needed updating
+
+2. external services:
+
+support more core external services for keyusers, not only "search_cohort", see externallib.php
+maybe also more output classes
+
+3. idnumber oder Name, was nimmt Upload?
+
+... Hackersicht
+
+4. Fehler:
+
+Unterrolle hat mehr Linked Fields als Default (andersrum)
+
+5. Keyuser sehen Users unter Nutzer/inne oder Nutzer/innen ist direkt ausgewählt
+
+6. Readonly-Flag verschieben, wenn Einstellungen der Linked-Fields geändert werden
+
+
+7. Enrolment-Plugins:
+Deinstallation nochmal anschauen
+De-Install: Enrolments nicht löschen, sondern auf Standard-Plugins umstellen (aber dann werden alle in einen Topf geworfen, nicht Rückgängig-machbar!)
+
+17. Excel-Import
+
+Bugs:
+
+User-Profil immer sichtbar? Oder über Gruppen
+Filtern (Nutzerliste und Bulk) - erledigt
+
+Gruppen r_ und dann umbenennen
+
+über bearbeiten-Button wird nur der Name der Gruppen geändert - erledigt
+
+andere Keyuser löschbar? Ist das ok?
+
+Nutzer anlegen: City wird übernommen (auch das in Klammern!), ist das ok?
+
+Nutzeruploads: globale Gruppen, Prefix, falsches Prefix usw. und Rollen, erledigt bis auf Rollen
+
+Bugs:
+Cohorts anlegen durch Keyuser funktioniert beim Upload nicht, Nutzer zu Cohorts hinzufügen
+
+
+
