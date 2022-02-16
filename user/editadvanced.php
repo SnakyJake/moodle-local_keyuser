@@ -77,10 +77,10 @@ if ($id == -1) {
     require_capability('local/keyuser:userupdate', $systemcontext);
 
     $sql = "SELECT * FROM {user} ";
-    $wheresql = "WHERE id = :id";
+    $wheresql = "WHERE {user}.id = :id";
     $params['id'] = $id;
-    keyuser_cohort_append_where($wheresql,$params);
-    $user = $DB->get_record_sql($sql, $params);
+    keyuser_user_append_where($wheresql,$params);
+    $user = $DB->get_record_sql($sql.$wheresql, $params);
     $PAGE->set_context(context_user::instance($user->id));
     $PAGE->navbar->includesettingsbase = true;
     if ($user->id != $USER->id) {
