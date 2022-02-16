@@ -297,12 +297,27 @@ function keyuser_cohort_where(&$params){
     return $DB->sql_like('idnumber',':prefix');
 }
 
-function keyuser_cohort_add_prefix(&$cohortname){
-    global $KEYUSER_CFG;
+function keyuser_cohort_add_prefix(&$cohortname,$fixexisting=false){
+    global $KEYUSER_CFG,$DB;
 
     $prefix = keyuser_cohort_get_prefix();
     if($prefix){
-        if(substr($cohortname, 0, strlen($prefix)) != $prefix){
+        if($fixexisting){
+            $tmp = $cohortname;
+            keyuser_cohort_remove_prefix($tmp);
+            $sql = "SELECT id FROM {cohort} c ";
+            $wheresql = "WHERE ".$DB->sql_like("c.name",":cname");
+            if($DB->record_exists_sql($sql . $wheresql,["cname"=>$prefix.$tmp."%"]))
+            {
+                $cohortname = $prefix . $tmp;
+
+            } else {
+                if($DB->record_exists_sql($sql . $wheresql,["cname"=>$prefix."r_".$tmp."%"]))
+                {
+                    $cohortname = $prefix . "r_" . $tmp;
+                }
+            }
+        } else if(substr($cohortname, 0, strlen($prefix)) != $prefix){
             $cohortname = $prefix . $cohortname;
         }
         return true;

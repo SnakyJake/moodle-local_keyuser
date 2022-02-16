@@ -136,7 +136,8 @@ class keyuser_csv_import_reader extends csv_import_reader {
                         } else {
                             foreach($this->_cohort_col_keys as $key){
                                 if($fgetdata[$key]) {
-                                    keyuser_cohort_add_prefix($fgetdata[$key]);
+                                    //true as second param handles r_ readonly cohorts
+                                    keyuser_cohort_add_prefix($fgetdata[$key],true);
                                 }
                             }
                             foreach($this->_cols_to_remove_keys as $key){
@@ -176,7 +177,8 @@ class keyuser_csv_import_reader extends csv_import_reader {
                     } else {
                         foreach($this->_cohort_col_keys as $key){
                             if($fgetdata[$key]) {
-                                keyuser_cohort_add_prefix($fgetdata[$key]);
+                                //true as second param handles r_ readonly cohorts
+                                keyuser_cohort_add_prefix($fgetdata[$key],true);
                             }
                         }
                         foreach($this->_cols_to_remove_keys as $key){
