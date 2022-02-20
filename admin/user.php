@@ -1,4 +1,4 @@
-s<?php
+<?php
 
     require(__DIR__ . '/../../../config.php');
     require_once($CFG->libdir.'/adminlib.php');

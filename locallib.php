@@ -245,7 +245,7 @@ function keyuser_user_where(&$params,$usertable=null){
     foreach($KEYUSER_CFG->linked_fields as $field){
         $wheresql .= ($wheresql ? " OR " : "")." (fieldid=:fieldid".$field->id . " AND ".$DB->sql_like('data',':data'.$field->id).")";
         $params["fieldid".$field->id] = $field->id;
-        $params["data".$field->id] = $DB->sql_like_escape($USER->profile[$field->shortname]);
+        $params["data".$field->id] = $DB->sql_like_escape(is_array($USER->profile[$field->shortname])?json_encode($USER->profile[$field->shortname]):$USER->profile[$field->shortname]);
         $has_empty_field = $has_empty_field || !$USER->profile[$field->shortname];
     }
     if($has_empty_field){
@@ -280,7 +280,7 @@ function keyuser_cohort_get_prefix(){
             $KEYUSER_CFG->no_prefix_allowed = false;
             return false;
         }
-        $prefix .= $USER->profile[$field->shortname]."_";
+        $prefix .= (is_array($USER->profile[$field->shortname])?implode(",",$USER->profile[$field->shortname]):$USER->profile[$field->shortname])."_";
     }
     return $prefix;
 }
