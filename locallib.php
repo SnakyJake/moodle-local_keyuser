@@ -176,11 +176,15 @@ function keyuser_cohort_append_where(&$wheresql, &$params){
 class keyuser_config {
      private $_cfg = null;
      public $linked_fields = [];
+     public $linked_fieldsmulti = [];
      public $linked_field_ids = [];
      public $cohort_prefix_fields = [];
+     public $cohort_prefix_fieldsmulti = [];
      public $cohort_prefix_field_ids = [];
      public $linked_default = [];
+     public $linked_multi_default = [];
      public $cohort_prefix_default = [];
+     public $cohort_prefix_multi_default = [];
      public $no_prefix_allowed = false;
 
      function __construct(){
@@ -194,8 +198,14 @@ class keyuser_config {
         if(property_exists($this->_cfg,'linkedfieldsdefault') && $this->_cfg->linkedfieldsdefault){
             $this->linked_default = explode(",",$this->_cfg->linkedfieldsdefault);
         }
+        if(property_exists($this->_cfg,'linkedfieldsmultidefault') && $this->_cfg->linkedfieldsmultidefault){
+            $this->linked_multi_default = explode(",",$this->_cfg->linkedfieldsmultidefault);
+        }
         if(property_exists($this->_cfg,'cohortprefixfieldsdefault') && $this->_cfg->cohortprefixfieldsdefault){
             $this->cohort_prefix_default = explode(",",$this->_cfg->cohortprefixfieldsdefault);
+        }
+        if(property_exists($this->_cfg,'cohortprefixfieldsmultidefault') && $this->_cfg->cohortprefixfieldsmultidefault){
+            $this->cohort_prefix_multi_default = explode(",",$this->_cfg->cohortprefixfieldsmultidefault);
         }
         $roles = $DB->get_records('role_assignments', ['userid' => $USER->id]);
         //$roles = get_user_roles(context_system::instance(), $USER->id);
@@ -216,6 +226,14 @@ class keyuser_config {
                         $this->cohort_prefix_fields[$field_id] = $DB->get_record('user_info_field', ['id' => $field_id], '*');
                     }
                 }
+                $property = 'linkedfieldsmulti'.$role->roleid;
+                if(property_exists($this->_cfg,$property) && $this->_cfg->$property){
+                    $this->linked_fieldsmulti = array_unique(array_merge($this->linked_fieldsmulti = explode(",",$this->_cfg->$property)));
+                }
+                $property = 'cohortprefixfieldsmulti'.$role->roleid;
+                if(property_exists($this->_cfg,$property) && $this->_cfg->$property){
+                    $this->cohort_prefix_fieldsmulti = array_unique(array_merge($this->cohort_prefix_fieldsmulti,explode(",",$this->_cfg->$property)));
+                }
             }
         }
         if(empty($this->linked_field_ids)){
@@ -230,6 +248,12 @@ class keyuser_config {
                 $this->cohort_prefix_fields[$field_id] = $DB->get_record('user_info_field', ['id' => $field_id], '*');
             }
         }
+        if(empty($this->linked_fieldsmulti)){
+            $this->linked_fieldsmulti = $this->linked_multi_default;
+        }
+        if(empty($this->cohort_prefix_fieldsmulti)){
+            $this->cohort_prefix_fieldsmulti = $this->cohort_prefix_multi_default;
+        }
     }
 }
 
@@ -243,9 +267,19 @@ function keyuser_user_where(&$params,$usertable=null){
     $wheresql = '';
     $has_empty_field = false;
     foreach($KEYUSER_CFG->linked_fields as $field){
-        $wheresql .= ($wheresql ? " OR " : "")." (fieldid=:fieldid".$field->id . " AND ".$DB->sql_like('data',':data'.$field->id).")";
+        $wheresql .= ($wheresql ? " OR " : "")." (fieldid=:fieldid".$field->id;
         $params["fieldid".$field->id] = $field->id;
-        $params["data".$field->id] = $DB->sql_like_escape(is_array($USER->profile[$field->shortname])?json_encode($USER->profile[$field->shortname]):$USER->profile[$field->shortname]);
+        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->linked_fieldsmulti)){
+            $count = 0;
+            foreach($USER->profile[$field->shortname] as $value){
+                $wheresql .= " AND ".$DB->sql_like('data',':data'.$field->id.$count).")";
+                $params["data".$field->id.$count] = $DB->sql_like_escape($value);
+                $count++;
+            }
+        } else {
+            $wheresql .= " AND ".$DB->sql_like('data',':data'.$field->id).")";
+            $params["data".$field->id] = $DB->sql_like_escape(is_array($USER->profile[$field->shortname])?json_encode($USER->profile[$field->shortname]):$USER->profile[$field->shortname]);
+        }
         $has_empty_field = $has_empty_field || !$USER->profile[$field->shortname];
     }
     if($has_empty_field){
@@ -280,21 +314,50 @@ function keyuser_cohort_get_prefix(){
             $KEYUSER_CFG->no_prefix_allowed = false;
             return false;
         }
-        $prefix .= (is_array($USER->profile[$field->shortname])?implode(",",$USER->profile[$field->shortname]):$USER->profile[$field->shortname])."_";
+        $prefix .= (is_array($USER->profile[$field->shortname])?implode("_",$USER->profile[$field->shortname]):$USER->profile[$field->shortname])."_";
     }
     return $prefix;
+}
+function keyuser_cohort_get_prefixes(){
+    global $KEYUSER_CFG,$USER;
+    $prefixes = [""];
+    foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
+        if(!$USER->profile[$field->shortname]){
+            //disable "no_prefix_allowed" if prefix fields are chosen!
+            $KEYUSER_CFG->no_prefix_allowed = false;
+            return false;
+        }
+        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->linked_fieldsmulti)){
+            foreach($USER->profile[$field->shortname] as $value){
+                foreach($prefixes as &$prefix){
+                    $prefix .= $value."_";
+                }
+            }
+        } else {
+            foreach($prefixes as &$prefix){
+                $prefix .= (is_array($USER->profile[$field->shortname])?implode("_",$USER->profile[$field->shortname]):$USER->profile[$field->shortname])."_";
+            }
+        }
+    }
+    return $prefixes;
 }
 
 function keyuser_cohort_where(&$params){
     global $KEYUSER_CFG,$DB;
 
-    $prefix = keyuser_cohort_get_prefix();
+    $prefixes = keyuser_cohort_get_prefixes();
     
-    if(!$prefix && !$KEYUSER_CFG->no_prefix_allowed){
+    if(empty($prefixes) && !$KEYUSER_CFG->no_prefix_allowed){
         return "1=2";
     }
-    $params['prefix'] = $DB->sql_like_escape($prefix)."%";
-    return $DB->sql_like('idnumber',':prefix');
+    $sqllike = "";
+    $count = 0;
+    foreach($prefixes as $prefix){
+        $sqllike = ($sqllike?" AND ":"").$DB->sql_like('idnumber',':prefix'.$count);
+        $params['prefix'.$count] = $DB->sql_like_escape($prefix)."%";
+        $count++;
+    }
+    return $sqllike;
 }
 
 function keyuser_cohort_add_prefix(&$cohortname,$fixexisting=false){

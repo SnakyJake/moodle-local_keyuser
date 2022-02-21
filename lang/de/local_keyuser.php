@@ -53,9 +53,14 @@ $string['heading_unchangedfilescount'] = '{$a} Dateien sind gleich geblieben:';
 
 $string['settings_keyuser_no_prefix_allowed'] = "Erlaube Globale Gruppen ohne verlinkten Prefix";
 $string['settings_keyuser_linkedfields'] = "Verknüpfte Profilfelder";
-$string['settings_keyuser_linkedfields_help'] = "Die Profilfelder, die der Keyuserin/dem Keyuser die Userinnen bzw. Usern zuweisen.";
+$string['settings_keyuser_linkedfieldshelp'] = "Die Profilfelder, die der Keyuserin/dem Keyuser die Userinnen bzw. Usern zuweisen.";
+$string['settings_keyuser_linkedfieldsmulti'] = "Profilfelder mit Mehrfachwerten";
+$string['settings_keyuser_linkedfieldsmultihelp'] = "Bei Auswahl werden alle Werte akzeptiert!";
 $string['settings_keyuser_cohortprefixfields'] = "Prefix-Profilfelder";
-$string['settings_keyuser_cohortprefixfields_help'] = "Prefix-Profilfelder für die automatische Benennung Globaler Gruppen.";
+$string['settings_keyuser_cohortprefixfieldshelp'] = "Prefix-Profilfelder für die automatische Benennung Globaler Gruppen.";
+$string['settings_keyuser_cohortprefixfieldsmulti'] = "Prefix-Profilfelder Mehrfachwerte";
+$string['settings_keyuser_cohortprefixfieldsmultihelp'] = "Zeige alle Globalen Gruppen mit nur einem dieser Werte";
+
 
 $string['edit_profilefields'] = "Profilfelder bearbeiten";
 

@@ -54,7 +54,9 @@ if ($hassiteconfig){
 
     $settings->add(new admin_setting_heading('local_keyuser/defaultfields','', get_string('default')));
     $settings->add(new admin_setting_configmultiselect('local_keyuser/linkedfieldsdefault', get_string('settings_keyuser_linkedfields','local_keyuser'),'',[],$options));
+    $settings->add(new admin_setting_configmultiselect('local_keyuser/linkedfieldsmultidefault', get_string('settings_keyuser_linkedfieldsmulti','local_keyuser'),'',[],$options));
     $settings->add(new admin_setting_configmultiselect('local_keyuser/cohortprefixfieldsdefault', get_string('settings_keyuser_cohortprefixfields','local_keyuser'),'',[],$options));
+    $settings->add(new admin_setting_configmultiselect('local_keyuser/cohortprefixfieldsmultidefault', get_string('settings_keyuser_cohortprefixfieldsmulti','local_keyuser'),'',[],$options));
 
     foreach($roles as $role){
         if(array_search($role->id,$systemroles) !== false){
@@ -64,10 +66,18 @@ if ($hassiteconfig){
             $tmp->add_dependent_on('local_keyuser/roleenabled'.$role->id);
             $settings->add($tmp);
             $settings->hide_if('local_keyuser/linkedfields'.$role->id,'local_keyuser/roleenabled'.$role->id);
+            $tmp = new admin_setting_configmultiselect('local_keyuser/linkedfieldsmulti'.$role->id, get_string('settings_keyuser_linkedfieldsmulti','local_keyuser'),'',$KEYUSER_CFG->linked_multi_default,$options);
+            $tmp->add_dependent_on('local_keyuser/roleenabled'.$role->id);
+            $settings->add($tmp);
+            $settings->hide_if('local_keyuser/linkedfieldsmulti'.$role->id,'local_keyuser/roleenabled'.$role->id);
             $tmp = new admin_setting_configmultiselect('local_keyuser/cohortprefixfields'.$role->id, get_string('settings_keyuser_cohortprefixfields','local_keyuser'),'',$KEYUSER_CFG->cohort_prefix_default,$options);
             $tmp->add_dependent_on('local_keyuser/roleenabled'.$role->id);
             $settings->add($tmp);
             $settings->hide_if('local_keyuser/cohortprefixfields'.$role->id,'local_keyuser/roleenabled'.$role->id);
+            $tmp = new admin_setting_configmultiselect('local_keyuser/cohortprefixfieldsmulti'.$role->id, get_string('settings_keyuser_cohortprefixfieldsmulti','local_keyuser'),'',$KEYUSER_CFG->cohort_prefix_multi_default,$options);
+            $tmp->add_dependent_on('local_keyuser/roleenabled'.$role->id);
+            $settings->add($tmp);
+            $settings->hide_if('local_keyuser/cohortprefixfieldsmulti'.$role->id,'local_keyuser/roleenabled'.$role->id);
         }
     }
     

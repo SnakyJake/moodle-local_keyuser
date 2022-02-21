@@ -54,9 +54,13 @@ $string['heading_unchangedfilescount'] = '{$a} files are the same:';
 
 $string['settings_keyuser_no_prefix_allowed'] = "Allow no linked cohort prefix field";
 $string['settings_keyuser_linkedfields'] = "Linked profile fields";
-$string['settings_keyuser_linkedfields_help'] = "Which custom profile fields are linked between keyuser and the users he manages.";
+$string['settings_keyuser_linkedfieldshelp'] = "Which custom profile fields are linked between keyuser and the users he manages.";
+$string['settings_keyuser_linkedfieldsmulti'] = "Linked profile fields multiple values";
+$string['settings_keyuser_linkedfieldsmultihelp'] = "All values of this multi value field are accepted";
 $string['settings_keyuser_cohortprefixfields'] = "cohort prefix fields";
-$string['settings_keyuser_cohortprefixfields_help'] = "cohort prefix fields";
+$string['settings_keyuser_cohortprefixfieldshelp'] = "cohort prefix fields";
+$string['settings_keyuser_cohortprefixfieldsmulti'] = "cohort prefix fields multiple values";
+$string['settings_keyuser_cohortprefixfieldsmultihelp'] = "show all cohorts with any prefix of this multi value fields";
 
 $string['edit_profilefields'] = "Edit custom profile fields";
 
