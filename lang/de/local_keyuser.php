@@ -61,6 +61,7 @@ $string['settings_keyuser_cohortprefixfieldshelp'] = "Prefix-Profilfelder für d
 $string['settings_keyuser_cohortprefixfieldsmulti'] = "Prefix-Profilfelder Mehrfachwerte";
 $string['settings_keyuser_cohortprefixfieldsmultihelp'] = "Zeige alle Globalen Gruppen mit nur einem dieser Werte";
 
+$string['label_cohort_prefix_select'] = "Gruppen-Präfix: ";
 
 $string['edit_profilefields'] = "Profilfelder bearbeiten";
 

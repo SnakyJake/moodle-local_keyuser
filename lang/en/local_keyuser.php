@@ -62,6 +62,8 @@ $string['settings_keyuser_cohortprefixfieldshelp'] = "cohort prefix fields";
 $string['settings_keyuser_cohortprefixfieldsmulti'] = "cohort prefix fields multiple values";
 $string['settings_keyuser_cohortprefixfieldsmultihelp'] = "show all cohorts with any prefix of this multi value fields";
 
+$string['label_cohort_prefix_select'] = "Cohort prefix: ";
+
 $string['edit_profilefields'] = "Edit custom profile fields";
 
 $string['error_missing_fields'] = "This action cannot be executed. No profile fields are linked. Please contact the administrator!";

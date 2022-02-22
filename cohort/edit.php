@@ -195,6 +195,9 @@ if ($editform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+
+echo keyuser_cohort_prefix_select("edit.php");
+
 echo $OUTPUT->heading($strheading);
 
 if (!$id && ($editcontrols = keyuser_cohort_edit_controls($context, $baseurl))) {

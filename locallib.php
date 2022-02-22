@@ -306,58 +306,41 @@ function keyuser_cohort_is_readonly($cohortname){
 }
 
 function keyuser_cohort_get_prefix(){
-    global $KEYUSER_CFG,$USER;
+    global $KEYUSER_CFG,$USER,$SESSION;
+
     $prefix = '';
     foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
-        if(!$USER->profile[$field->shortname]){
+        if(empty($USER->profile[$field->shortname])){
             //disable "no_prefix_allowed" if prefix fields are chosen!
             $KEYUSER_CFG->no_prefix_allowed = false;
             return false;
         }
-        $prefix .= (is_array($USER->profile[$field->shortname])?implode("_",$USER->profile[$field->shortname]):$USER->profile[$field->shortname])."_";
+        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->cohort_prefix_fieldsmulti) && count($USER->profile[$field->shortname])>1){
+            $inputname = 'keyuser_prefix_'.$field->id;
+            $keyuser_prefix = optional_param($inputname, "", PARAM_TEXT);
+            if(empty($keyuser_prefix) && array_key_exists($inputname,$SESSION)){
+                $keyuser_prefix = $SESSION->$inputname;
+            } else {
+                $SESSION->$inputname = $keyuser_prefix;
+            }
+            $prefix .= $SESSION->$inputname."_";
+        } else {
+            $prefix .= (is_array($USER->profile[$field->shortname])?implode("_",$USER->profile[$field->shortname]):$USER->profile[$field->shortname])."_";
+        }
     }
     return $prefix;
-}
-function keyuser_cohort_get_prefixes(){
-    global $KEYUSER_CFG,$USER;
-    $prefixes = [""];
-    foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
-        if(!$USER->profile[$field->shortname]){
-            //disable "no_prefix_allowed" if prefix fields are chosen!
-            $KEYUSER_CFG->no_prefix_allowed = false;
-            return false;
-        }
-        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->linked_fieldsmulti)){
-            foreach($USER->profile[$field->shortname] as $value){
-                foreach($prefixes as &$prefix){
-                    $prefix .= $value."_";
-                }
-            }
-        } else {
-            foreach($prefixes as &$prefix){
-                $prefix .= (is_array($USER->profile[$field->shortname])?implode("_",$USER->profile[$field->shortname]):$USER->profile[$field->shortname])."_";
-            }
-        }
-    }
-    return $prefixes;
 }
 
 function keyuser_cohort_where(&$params){
     global $KEYUSER_CFG,$DB;
 
-    $prefixes = keyuser_cohort_get_prefixes();
+    $prefix = keyuser_cohort_get_prefix();
     
-    if(empty($prefixes) && !$KEYUSER_CFG->no_prefix_allowed){
+    if(empty($prefix) && !$KEYUSER_CFG->no_prefix_allowed){
         return "1=2";
     }
-    $sqllike = "";
-    $count = 0;
-    foreach($prefixes as $prefix){
-        $sqllike = ($sqllike?" AND ":"").$DB->sql_like('idnumber',':prefix'.$count);
-        $params['prefix'.$count] = $DB->sql_like_escape($prefix)."%";
-        $count++;
-    }
-    return $sqllike;
+    $params['prefix'] = $DB->sql_like_escape($prefix)."%";
+    return $DB->sql_like('idnumber',':prefix');
 }
 
 function keyuser_cohort_add_prefix(&$cohortname,$fixexisting=false){
@@ -406,3 +389,38 @@ function keyuser_cohort_remove_prefix(&$cohortname,$removerights = true){
     return $KEYUSER_CFG->no_prefix_allowed?true:false;
 }
 
+function keyuser_cohort_prefix_select($url='index.php'){
+    global $OUTPUT,$KEYUSER_CFG,$USER,$SESSION;
+    $result = "";
+    foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
+        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->cohort_prefix_fieldsmulti) && count($USER->profile[$field->shortname])>1){
+            $inputname = 'keyuser_prefix_'.$field->id;
+            $keyuser_prefix = optional_param($inputname, "", PARAM_TEXT);
+            if(empty($keyuser_prefix) && array_key_exists($inputname,$SESSION)){
+                $keyuser_prefix = $SESSION->$inputname;
+            } else {
+                $SESSION->$inputname = $keyuser_prefix;
+            }
+            $data = [
+                'name' => 'keyuser_prefix_'.$field->id,
+                'method' => 'post',
+                'action' => new moodle_url('/local/keyuser/cohort/'.$url),
+                'inputname' => $inputname,
+                'label' => get_string("label_cohort_prefix_select", "local_keyuser"),
+                'id' => 'keyuser_form_'.$field->id,
+                'formid' => 'keyuser_form_'.$field->id,
+                'options' => [],
+            ];
+            foreach($USER->profile[$field->shortname] as $value){
+                $data['options'][] = [
+                    'value' => $value,
+                    'name' => $value,
+                    'selected' => $value == $keyuser_prefix,
+                ];
+            }
+            
+            $result .= $OUTPUT->render_from_template('core/single_select', $data);
+        }
+    }
+    return $result;
+}

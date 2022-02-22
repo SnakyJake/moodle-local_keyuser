@@ -101,6 +101,8 @@ if ($cohorts['allcohorts'] > 0) {
 
 echo $OUTPUT->heading(get_string('cohortsin', 'cohort', $context->get_context_name()).$count);
 
+echo keyuser_cohort_prefix_select();
+
 $params = array('page' => $page);
 if ($contextid) {
     $params['contextid'] = $contextid;
@@ -133,29 +135,6 @@ $data = [
 ];
 
 echo $OUTPUT->render_from_template('core/search_input', $data);
-
-$data = [
-    'name' => 'keyuser_prefix',
-    'method' => 'get',
-    'action' => new moodle_url('/local/keyuser/cohort/index.php'),
-    'inputname' => 'keyuser_prefix',
-    'label' => "Zombies are coming...",
-    'id' => 'keyuser_form',
-    'formid' => 'keyuser_form',
-    'options' => array(
-        [
-            'value' => "bvb",
-            'name' => "bvb",
-            'selected' >= true,
-        ],
-        [
-            'value' => "bae",
-            'name' => "bae",
-        ],
-    ),
-];
-
-echo $OUTPUT->render_from_template('core/single_select', $data);
 
 // Output pagination bar.
 echo $OUTPUT->paging_bar($cohorts['totalcohorts'], $page, 25, $baseurl);
