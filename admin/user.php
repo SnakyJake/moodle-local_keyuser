@@ -221,6 +221,8 @@
     $ufiltering = new keyuser_user_filtering();
     echo $OUTPUT->header();
 
+    echo keyuser_linkedfield_select();
+
     // Carry on with the user listing
     $context = context_system::instance();
     // These columns are always shown in the users list.

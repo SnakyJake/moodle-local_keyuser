@@ -262,19 +262,33 @@ global $KEYUSER_CFG;
 $KEYUSER_CFG = new keyuser_config();
 
 function keyuser_user_where(&$params,$usertable=null){
-    global $DB,$USER,$KEYUSER_CFG;
+    global $DB,$USER,$KEYUSER_CFG,$SESSION;
     $sql = ($usertable?$usertable.".":"")."id IN (SELECT userid FROM (SELECT userid,count(userid) as cnt FROM {user_info_data} WHERE";
     $wheresql = '';
     $has_empty_field = false;
     foreach($KEYUSER_CFG->linked_fields as $field){
         $wheresql .= ($wheresql ? " OR " : "")." (fieldid=:fieldid".$field->id;
         $params["fieldid".$field->id] = $field->id;
-        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->linked_fieldsmulti)){
-            $count = 0;
-            foreach($USER->profile[$field->shortname] as $value){
-                $wheresql .= " AND ".$DB->sql_like('data',':data'.$field->id.$count).")";
-                $params["data".$field->id.$count] = $DB->sql_like_escape($value);
-                $count++;
+        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->linked_fieldsmulti) && !empty($USER->profile[$field->shortname])){
+            $inputname = 'keyuser_linkedfield_'.$field->id;
+            $keyuser_linkedfield = optional_param($inputname, "", PARAM_TEXT);
+            if(empty($keyuser_linkedfield) && array_key_exists($keyuser_linkedfield,$SESSION)){
+                $keyuser_linkedfield = $SESSION->$inputname;
+            } else {
+                $SESSION->$inputname = $keyuser_linkedfield;
+            }
+            $wheresql .= " AND json_valid({user_info_data}.data) AND (";
+            if(empty($keyuser_linkedfield)){
+                $count = 0;
+                foreach($USER->profile[$field->shortname] as $value){
+                    $wheresql .= ($count?" OR ":"")."json_contains({user_info_data}.data->'$',:data".$field->id.$count.",'$')";
+                    $params["data".$field->id.$count] = "[\"".$value."\"]";
+                    $count++;
+                }
+                $wheresql .= "))";
+            } else {
+                $wheresql .= "json_contains({user_info_data}.data->'$',:data".$field->id.",'$')))";
+                $params["data".$field->id] = "[\"".$keyuser_linkedfield."\"]";
             }
         } else {
             $wheresql .= " AND ".$DB->sql_like('data',':data'.$field->id).")";
@@ -407,8 +421,8 @@ function keyuser_cohort_prefix_select($url='index.php'){
                 'action' => new moodle_url('/local/keyuser/cohort/'.$url),
                 'inputname' => $inputname,
                 'label' => get_string("label_cohort_prefix_select", "local_keyuser"),
-                'id' => 'keyuser_form_'.$field->id,
-                'formid' => 'keyuser_form_'.$field->id,
+                'id' => 'keyuser_form_cohort_prefix_'.$field->id,
+                'formid' => 'keyuser_form_cohort_prefix_'.$field->id,
                 'options' => [],
             ];
             foreach($USER->profile[$field->shortname] as $value){
@@ -416,6 +430,42 @@ function keyuser_cohort_prefix_select($url='index.php'){
                     'value' => $value,
                     'name' => $value,
                     'selected' => $value == $keyuser_prefix,
+                ];
+            }
+            
+            $result .= $OUTPUT->render_from_template('core/single_select', $data);
+        }
+    }
+    return $result;
+}
+
+function keyuser_linkedfield_select($url='user.php'){
+    global $OUTPUT,$KEYUSER_CFG,$USER,$SESSION;
+    $result = "";
+    foreach($KEYUSER_CFG->linked_fields as $field){
+        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->cohort_prefix_fieldsmulti) && count($USER->profile[$field->shortname])>1){
+            $inputname = 'keyuser_linkedfield_'.$field->id;
+            $keyuser_linkedfield = optional_param($inputname, "", PARAM_TEXT);
+            if(empty($keyuser_linkedfield) && !isset($_POST[$inputname]) && array_key_exists($inputname,$SESSION)){
+                $keyuser_linkedfield = $SESSION->$inputname;
+            } else {
+                $SESSION->$inputname = $keyuser_linkedfield;
+            }
+            $data = [
+                'name' => 'keyuser_linkedfield_'.$field->id,
+                'method' => 'post',
+                'action' => new moodle_url('/local/keyuser/admin/'.$url),
+                'inputname' => $inputname,
+                'label' => get_string("label_linkedfield_select", "local_keyuser"),
+                'id' => 'keyuser_form_linkedfield_'.$field->id,
+                'formid' => 'keyuser_form_linkedfield_'.$field->id,
+                'options' => [['value' => "",'name'=>get_string("all"),'selected'=>$keyuser_linkedfield===0]],
+            ];
+            foreach($USER->profile[$field->shortname] as $value){
+                $data['options'][] = [
+                    'value' => $value,
+                    'name' => $value,
+                    'selected' => $value == $keyuser_linkedfield,
                 ];
             }
             

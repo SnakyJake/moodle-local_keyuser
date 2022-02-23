@@ -63,6 +63,7 @@ $string['settings_keyuser_cohortprefixfieldsmulti'] = "cohort prefix fields mult
 $string['settings_keyuser_cohortprefixfieldsmultihelp'] = "show all cohorts with any prefix of this multi value fields";
 
 $string['label_cohort_prefix_select'] = "Cohort prefix: ";
+$string['label_linkedfield_select'] = "Link: ";
 
 $string['edit_profilefields'] = "Edit custom profile fields";
 

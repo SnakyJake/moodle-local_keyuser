@@ -84,6 +84,8 @@ require(['jquery'], function(\$) {
 
 echo $OUTPUT->header();
 
+echo keyuser_cohort_prefix_select();
+
 if ($showall) {
     $cohorts = keyuser_cohort_get_all_cohorts($page, 25, $searchquery);
 } else {
@@ -100,8 +102,6 @@ if ($cohorts['allcohorts'] > 0) {
 }
 
 echo $OUTPUT->heading(get_string('cohortsin', 'cohort', $context->get_context_name()).$count);
-
-echo keyuser_cohort_prefix_select();
 
 $params = array('page' => $page);
 if ($contextid) {
