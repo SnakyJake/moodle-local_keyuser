@@ -172,7 +172,8 @@ if ($returnto === 'profile') {
     if($user->id == -1){
         $returnurl = new moodle_url('/admin/search.php#linkusers');
     } else {
-        $returnurl = new moodle_url('/user/preferences.php', array('userid' => $user->id));
+        //$returnurl = new moodle_url('/user/preferences.php', array('userid' => $user->id));
+        $returnurl = new moodle_url('/local/keyuser/admin/user.php');
     }
 }
 
