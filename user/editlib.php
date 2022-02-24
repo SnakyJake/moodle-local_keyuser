@@ -267,7 +267,9 @@ function keyuser_profile_definition($mform, $userid = 0, $overrides = []) {
             keyuser_profile_field::edit_field($mform,$formfield);
             if(array_key_exists($formfield->fieldid,$overrides)){
                 $mform->hardFreeze($formfield->inputname);
-                $mform->setConstant($formfield->inputname, $formfield->data);
+                $fieldvalue = $formfield->data;
+                keyuser_is_field_multivalue($formfield->field,$fieldvalue);
+                $mform->setConstant($formfield->inputname, $fieldvalue);
             }
         }
     }

@@ -207,8 +207,8 @@ class keyuser_config {
         if(property_exists($this->_cfg,'cohortprefixfieldsmultidefault') && $this->_cfg->cohortprefixfieldsmultidefault){
             $this->cohort_prefix_multi_default = explode(",",$this->_cfg->cohortprefixfieldsmultidefault);
         }
-        $roles = $DB->get_records('role_assignments', ['userid' => $USER->id]);
-        //$roles = get_user_roles(context_system::instance(), $USER->id);
+        //$roles = $DB->get_records('role_assignments', ['userid' => $USER->id]);
+        $roles = get_user_roles(context_system::instance(), $USER->id);
         foreach($roles as $role){
             $roleenabled = 'roleenabled'.$role->roleid;
             if(property_exists($this->_cfg,$roleenabled) && $this->_cfg->$roleenabled){
@@ -261,6 +261,16 @@ unset($KEYUSER_CFG);
 global $KEYUSER_CFG;
 $KEYUSER_CFG = new keyuser_config();
 
+//returns array or string
+function keyuser_is_field_multivalue($field,&$fieldvalue){
+    global $KEYUSER_CFG,$USER;
+    $tmp = json_decode($USER->profile[$field->shortname]);
+    if(json_last_error() === JSON_ERROR_NONE){
+        $fieldvalue = $tmp;
+    }
+    return is_array($fieldvalue) && in_array($field->id,$KEYUSER_CFG->linked_fieldsmulti) && !empty($fieldvalue);
+}
+
 function keyuser_user_where(&$params,$usertable=null){
     global $DB,$USER,$KEYUSER_CFG,$SESSION;
     $sql = ($usertable?$usertable.".":"")."id IN (SELECT userid FROM (SELECT userid,count(userid) as cnt FROM {user_info_data} WHERE";
@@ -269,7 +279,8 @@ function keyuser_user_where(&$params,$usertable=null){
     foreach($KEYUSER_CFG->linked_fields as $field){
         $wheresql .= ($wheresql ? " OR " : "")." (fieldid=:fieldid".$field->id;
         $params["fieldid".$field->id] = $field->id;
-        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->linked_fieldsmulti) && !empty($USER->profile[$field->shortname])){
+        $fieldvalue = $USER->profile[$field->shortname];
+        if(keyuser_is_field_multivalue($field,$fieldvalue)){
             $inputname = 'keyuser_linkedfield_'.$field->id;
             $keyuser_linkedfield = optional_param($inputname, "", PARAM_TEXT);
             if(empty($keyuser_linkedfield) && array_key_exists($keyuser_linkedfield,$SESSION)){
@@ -280,7 +291,7 @@ function keyuser_user_where(&$params,$usertable=null){
             $wheresql .= " AND json_valid({user_info_data}.data) AND (";
             if(empty($keyuser_linkedfield)){
                 $count = 0;
-                foreach($USER->profile[$field->shortname] as $value){
+                foreach($fieldvalue as $value){
                     $wheresql .= ($count?" OR ":"")."json_contains({user_info_data}.data->'$',:data".$field->id.$count.",'$')";
                     $params["data".$field->id.$count] = "[\"".$value."\"]";
                     $count++;
@@ -292,9 +303,9 @@ function keyuser_user_where(&$params,$usertable=null){
             }
         } else {
             $wheresql .= " AND ".$DB->sql_like('data',':data'.$field->id).")";
-            $params["data".$field->id] = $DB->sql_like_escape(is_array($USER->profile[$field->shortname])?json_encode($USER->profile[$field->shortname]):$USER->profile[$field->shortname]);
+            $params["data".$field->id] = $DB->sql_like_escape(is_array($fieldvalue)?json_encode($fieldvalue):$fieldvalue);
         }
-        $has_empty_field = $has_empty_field || !$USER->profile[$field->shortname];
+        $has_empty_field = $has_empty_field || empty($fieldvalue);
     }
     if($has_empty_field){
         $wheresql .= ($wheresql ? " AND ":"")."1=2";
