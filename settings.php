@@ -89,7 +89,14 @@ if ($hassiteconfig){
     new moodle_url('/local/keyuser/checkmoodlechanges.php')));
 }
 
-if (has_capability('local/keyuser:userupdate', $systemcontext) or has_capability('local/keyuser:userdelete', $systemcontext)) {
+if (has_capability('local/keyuser:uploadusers', $systemcontext) 
+ or has_capability('local/keyuser:userupdate', $systemcontext) 
+ or has_capability('local/keyuser:userdelete', $systemcontext) 
+ or has_capability('local/keyuser:usercreate', $systemcontext) 
+ or has_capability('local/keyuser:userbulkactions', $systemcontext)
+ or has_capability('local/keyuser:cohortmanage', $systemcontext)
+ or has_capability('local/keyuser:cohortview', $systemcontext)
+) {
     $ADMIN->add(
         'users',
         new admin_category(
@@ -110,15 +117,17 @@ if (has_capability('local/keyuser:userupdate', $systemcontext) or has_capability
             array('local/keyuser:userupdate','local/keyuser:userdelete'),
         )
     );
-    $ADMIN->add(
-        'keyusersettings', 
-        new admin_externalpage(
-            'keyuser_userbulk', 
-            new lang_string('userbulk','admin'),
-            new moodle_url('/local/keyuser/admin/user/user_bulk.php'), 
-            array('local/keyuser:userupdate','local/keyuser:userdelete','local/keyuser:userbulkactions'),
-        )
+    if(has_capability('local/keyuser:userbulkactions', $systemcontext)){
+        $ADMIN->add(
+            'keyusersettings', 
+            new admin_externalpage(
+                'keyuser_userbulk', 
+                new lang_string('userbulk','admin'),
+                new moodle_url('/local/keyuser/admin/user/user_bulk.php'), 
+                array('local/keyuser:userupdate','local/keyuser:userdelete','local/keyuser:userbulkactions'),
+            )
         );
+    }
     $ADMIN->add(
         'keyusersettings',
         new admin_externalpage(

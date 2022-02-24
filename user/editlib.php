@@ -246,6 +246,7 @@ function keyuser_useredit_shared_definition(&$mform, $editoroptions, $filemanage
  * @param int $userid id of user whose profile is being edited.
  */
 function keyuser_profile_definition($mform, $userid = 0, $overrides = []) {
+    global $KEYUSER_CFG;
     $categories = profile_get_user_fields_with_data_by_category($userid);
     foreach ($categories as $categoryid => $fields) {
         // Check first if *any* fields will be displayed.
@@ -268,7 +269,7 @@ function keyuser_profile_definition($mform, $userid = 0, $overrides = []) {
             if(array_key_exists($formfield->fieldid,$overrides)){
                 $mform->hardFreeze($formfield->inputname);
                 $fieldvalue = $formfield->data;
-                keyuser_is_field_multivalue($formfield->field,$fieldvalue);
+                keyuser_is_multivalue($formfield->field,$fieldvalue,$KEYUSER_CFG->linked_fieldsmulti);
                 $mform->setConstant($formfield->inputname, $fieldvalue);
             }
         }

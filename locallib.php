@@ -261,16 +261,6 @@ unset($KEYUSER_CFG);
 global $KEYUSER_CFG;
 $KEYUSER_CFG = new keyuser_config();
 
-//returns array or string
-function keyuser_is_field_multivalue($field,&$fieldvalue){
-    global $KEYUSER_CFG,$USER;
-    $tmp = json_decode($USER->profile[$field->shortname]);
-    if(json_last_error() === JSON_ERROR_NONE){
-        $fieldvalue = $tmp;
-    }
-    return is_array($fieldvalue) && in_array($field->id,$KEYUSER_CFG->linked_fieldsmulti) && !empty($fieldvalue);
-}
-
 function keyuser_user_where(&$params,$usertable=null){
     global $DB,$USER,$KEYUSER_CFG,$SESSION;
     $sql = ($usertable?$usertable.".":"")."id IN (SELECT userid FROM (SELECT userid,count(userid) as cnt FROM {user_info_data} WHERE";
@@ -280,7 +270,7 @@ function keyuser_user_where(&$params,$usertable=null){
         $wheresql .= ($wheresql ? " OR " : "")." (fieldid=:fieldid".$field->id;
         $params["fieldid".$field->id] = $field->id;
         $fieldvalue = $USER->profile[$field->shortname];
-        if(keyuser_is_field_multivalue($field,$fieldvalue)){
+        if(keyuser_is_multivalue($field,$fieldvalue,$KEYUSER_CFG->linked_fieldsmulti)){
             $inputname = 'keyuser_linkedfield_'.$field->id;
             $keyuser_linkedfield = optional_param($inputname, "", PARAM_TEXT);
             if(empty($keyuser_linkedfield) && array_key_exists($keyuser_linkedfield,$SESSION)){
@@ -340,7 +330,8 @@ function keyuser_cohort_get_prefix(){
             $KEYUSER_CFG->no_prefix_allowed = false;
             return false;
         }
-        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->cohort_prefix_fieldsmulti) && count($USER->profile[$field->shortname])>1){
+        $fieldvalue = $USER->profile[$field->shortname];
+        if(keyuser_is_multivalue($field,$fieldvalue,$KEYUSER_CFG->cohort_prefix_fieldsmulti)){
             $inputname = 'keyuser_prefix_'.$field->id;
             $keyuser_prefix = optional_param($inputname, "", PARAM_TEXT);
             if(empty($keyuser_prefix) && array_key_exists($inputname,$SESSION)){
@@ -350,7 +341,7 @@ function keyuser_cohort_get_prefix(){
             }
             $prefix .= $SESSION->$inputname."_";
         } else {
-            $prefix .= (is_array($USER->profile[$field->shortname])?implode("_",$USER->profile[$field->shortname]):$USER->profile[$field->shortname])."_";
+            $prefix .= (is_array($fieldvalue)?implode("_",$fieldvalue):$fieldvalue)."_";
         }
     }
     return $prefix;
@@ -418,7 +409,8 @@ function keyuser_cohort_prefix_select($url='index.php'){
     global $OUTPUT,$KEYUSER_CFG,$USER,$SESSION;
     $result = "";
     foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
-        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->cohort_prefix_fieldsmulti) && count($USER->profile[$field->shortname])>1){
+        $fieldvalue = $USER->profile[$field->shortname];
+        if(keyuser_is_multivalue($field,$fieldvalue,$KEYUSER_CFG->cohort_prefix_fieldsmulti)){
             $inputname = 'keyuser_prefix_'.$field->id;
             $keyuser_prefix = optional_param($inputname, "", PARAM_TEXT);
             if(empty($keyuser_prefix) && array_key_exists($inputname,$SESSION)){
@@ -436,7 +428,7 @@ function keyuser_cohort_prefix_select($url='index.php'){
                 'formid' => 'keyuser_form_cohort_prefix_'.$field->id,
                 'options' => [],
             ];
-            foreach($USER->profile[$field->shortname] as $value){
+            foreach($fieldvalue as $value){
                 $data['options'][] = [
                     'value' => $value,
                     'name' => $value,
@@ -454,7 +446,8 @@ function keyuser_linkedfield_select($url='user.php'){
     global $OUTPUT,$KEYUSER_CFG,$USER,$SESSION;
     $result = "";
     foreach($KEYUSER_CFG->linked_fields as $field){
-        if(is_array($USER->profile[$field->shortname]) && in_array($field->id,$KEYUSER_CFG->cohort_prefix_fieldsmulti) && count($USER->profile[$field->shortname])>1){
+        $fieldvalue = $USER->profile[$field->shortname];
+        if(keyuser_is_multivalue($field,$fieldvalue,$KEYUSER_CFG->linked_fieldsmulti)){
             $inputname = 'keyuser_linkedfield_'.$field->id;
             $keyuser_linkedfield = optional_param($inputname, "", PARAM_TEXT);
             if(empty($keyuser_linkedfield) && !isset($_POST[$inputname]) && array_key_exists($inputname,$SESSION)){
@@ -472,7 +465,7 @@ function keyuser_linkedfield_select($url='user.php'){
                 'formid' => 'keyuser_form_linkedfield_'.$field->id,
                 'options' => [['value' => "",'name'=>get_string("all"),'selected'=>$keyuser_linkedfield===0]],
             ];
-            foreach($USER->profile[$field->shortname] as $value){
+            foreach($fieldvalue as $value){
                 $data['options'][] = [
                     'value' => $value,
                     'name' => $value,
@@ -485,3 +478,14 @@ function keyuser_linkedfield_select($url='user.php'){
     }
     return $result;
 }
+
+//returns array or string
+function keyuser_is_multivalue($field,&$value,$multiconfig){
+    global $KEYUSER_CFG,$USER;
+    $tmp = json_decode($USER->profile[$field->shortname]);
+    if(json_last_error() === JSON_ERROR_NONE){
+        $value = $tmp;
+    }
+    return is_array($value) && in_array($field->id,$multiconfig) && !empty($value);
+}
+
