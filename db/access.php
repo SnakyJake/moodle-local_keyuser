@@ -48,6 +48,13 @@ $capabilities = array(
         'clonepermissionsfrom' => 'moodle/user:update'
     ),
 
+    'local/keyuser:userbulkactions' => array(
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'clonepermissionsfrom' => 'moodle/user:update'
+    ),
+
     'local/keyuser:userviewdetails' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,

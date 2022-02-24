@@ -42,6 +42,8 @@ $string['keyuser:userviewlastip'] = get_string('user:viewlastip','role');
 $string['keyuser:userviewhiddendetails'] =  get_string('user:viewhiddendetails','role');
 $string['keyuser:uploadusers'] = 'Upload users';
 
+$string['keyuser:userbulkactions'] = get_string('userbulk','admin');
+
 $string['keyuser:cohortmanage'] = get_string('cohort:manage','role');
 $string['keyuser:cohortview'] = get_string('cohort:view','role');
 $string['keyuser:cohortassign'] = get_string('cohort:assign','role');

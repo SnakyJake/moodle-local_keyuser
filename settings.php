@@ -116,7 +116,7 @@ if (has_capability('local/keyuser:userupdate', $systemcontext) or has_capability
             'keyuser_userbulk', 
             new lang_string('userbulk','admin'),
             new moodle_url('/local/keyuser/admin/user/user_bulk.php'), 
-            array('local/keyuser:userupdate','local/keyuser:userdelete'),
+            array('local/keyuser:userupdate','local/keyuser:userdelete','local/keyuser:userbulkactions'),
         )
         );
     $ADMIN->add(
