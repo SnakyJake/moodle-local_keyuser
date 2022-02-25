@@ -86,7 +86,6 @@ function local_keyuser_control_view_profile($user, $course = null, context_user 
         keyuser_user_append_where($wheresql,$params);
         $r = $DB->get_record_sql($sql.$wheresql, $params);
         if($r->count > 0){
-            //$PAGE->set_other_editing_capability("local/keyuser:userupdate");         
             return core_user::VIEWPROFILE_FORCE_ALLOW;
         }
     }
