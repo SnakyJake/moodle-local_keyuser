@@ -62,13 +62,23 @@ function local_keyuser_inplace_editable($itemtype, $itemid, $newvalue) {
     }
 }
 
-function local_keyuser_myprofile_navigation($tree, $user, $iscurrentuser, $course){
+/**
+ * Implements callback myprofile_navigation() allowing to edit values in-place
+ *
+ * @param core_user\output\myprofile\tree $tree
+ * @param stdClass $user user object
+ * @param bool $iscurrentuser
+ * @param stdClass $course course object
+ * @return nothing
+ */
+
+function local_keyuser_myprofile_navigation(\core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course){
     global $USER;
     $systemcontext = context_system::instance();
     $courseid = !empty($course) ? $course->id : SITEID;
 
-    if (($iscurrentuser || is_siteadmin($USER) || !is_siteadmin($user)) && has_capability('local/keyuser:userupdate', $systemcontext)) {
-        $url = new moodle_url('/user/editadvanced.php', array('id' => $user->id, 'course' => $courseid,
+    if (!is_siteadmin($USER) && !has_capability('moodle/user:update', $systemcontext) && ($iscurrentuser || !is_siteadmin($user)) && has_capability('local/keyuser:userupdate', $systemcontext)) {
+        $url = new moodle_url('/local/keyuser/user/editadvanced.php', array('id' => $user->id, 'course' => $courseid,
             'returnto' => 'profile'));
         $node = new core_user\output\myprofile\node('contact', 'editprofile', get_string('editmyprofile'), null, $url,
             null, null, 'editprofile');
@@ -76,6 +86,14 @@ function local_keyuser_myprofile_navigation($tree, $user, $iscurrentuser, $cours
     }
 }
 
+/**
+ * Implements callback myprofile_navigation() allowing to edit values in-place
+ *
+ * @param stdClass $user user object
+ * @param stdClass $course course object
+ * @param context_user $usercontext
+ * @return const VIEWPROFILE_PREVENT, VIEWPROFILE_DO_NOT_PREVENT, VIEWPROFILE_FORCE_ALLOW
+ */
 function local_keyuser_control_view_profile($user, $course = null, context_user $usercontext = null) {
     global $DB,$PAGE;
     $systemcontext = context_system::instance();
