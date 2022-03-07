@@ -535,10 +535,13 @@ function keyuser_linkedfield_select($url='user.php'){
 
 //returns array or string
 function keyuser_is_multivalue($field,&$value,$multiconfig){
-    global $KEYUSER_CFG,$USER;
+    global $USER;
     $tmp = json_decode($USER->profile[$field->shortname]);
-    if(json_last_error() === JSON_ERROR_NONE){
+    $err = json_last_error();
+    if($err === JSON_ERROR_NONE){
         $value = $tmp;
+    } elseif ($err === JSON_ERROR_SYNTAX) {
+        $value = $USER->profile[$field->shortname];
     }
     return is_array($value) && in_array($field->id,$multiconfig) && count($value)>1;
 }
