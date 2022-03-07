@@ -39,10 +39,10 @@ MoodleQuickForm::registerElementType('keyusercohort', "$CFG->dirroot/local/keyus
 function local_keyuser_after_config(){
     if(array_key_exists('REQUEST_URI', $_SERVER)){
         $url = parse_url($_SERVER['REQUEST_URI']);
-        if($url['path'] == "/user/editadvanced.php") {
+        if(($url['path'] == "/user/editadvanced.php") || ($url['path'] == "/user/edit.php")) {
             $systemcontext = context_system::instance();
             if(!has_capability("moodle/user:update",$systemcontext) && (has_capability("local/keyuser:userupdate",$systemcontext) || ((strpos($url->query,"id=-1")!==false) && has_capability("local/keyuser:usercreate",$systemcontext)))){
-                redirect("/local/keyuser".$url['path']."?".$url['query']);
+                redirect("/local/keyuser/user/editadvanced.php?".$url['query']);
             }
         }
     }
@@ -77,13 +77,16 @@ function local_keyuser_myprofile_navigation(\core_user\output\myprofile\tree $tr
     $systemcontext = context_system::instance();
     $courseid = !empty($course) ? $course->id : SITEID;
 
-    if (!is_siteadmin($USER) && !has_capability('moodle/user:update', $systemcontext) && ($iscurrentuser || !is_siteadmin($user)) && has_capability('local/keyuser:userupdate', $systemcontext)) {
-        $url = new moodle_url('/local/keyuser/user/editadvanced.php', array('id' => $user->id, 'course' => $courseid,
-            'returnto' => 'profile'));
-        $node = new core_user\output\myprofile\node('contact', 'editprofile', get_string('editmyprofile'), null, $url,
-            null, null, 'editprofile');
-        $tree->add_node($node);
-    }
+	if(has_capability('local/keyuser:userupdate', $systemcontext)) {
+		$url = new moodle_url('/local/keyuser/user/editadvanced.php', array('id' => $user->id, 'course' => $courseid,
+			'returnto' => 'profile'));
+		$node = new core_user\output\myprofile\node('contact', 'editprofile', get_string('editmyprofile'), null, $url,
+			null, null, 'editprofile');
+		if(!isset($tree->nodes["editprofile"])){
+			$tree->add_node($node);
+            //$tree->categories["contact"]->sort_nodes();
+		}
+	}
 }
 
 /**
