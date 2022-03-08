@@ -264,6 +264,8 @@ function keyuser_profile_definition($mform, $userid = 0, $overrides = []) {
 
         // Display the header and the fields.
         $mform->addElement('header', 'category_'.$categoryid, format_string($fields[0]->get_category_name()));
+        //expand the important keyuser categories on default
+        $mform->setExpanded('category_'.$categoryid);
         foreach ($fieldstodisplay as $formfield) {
             keyuser_profile_field::edit_field($mform,$formfield);
             if(array_key_exists($formfield->fieldid,$overrides)){
