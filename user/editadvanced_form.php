@@ -58,9 +58,7 @@ class keyuser_user_editadvanced_form extends moodleform {
         $user = $this->_customdata['user'];
         $userid = $user->id;
 
-        // Accessibility: "Required" is bad legend text.
         $strgeneral  = get_string('general');
-        $strrequired = get_string('required');
 
         // Add some extra hidden fields.
         $mform->addElement('hidden', 'id');
