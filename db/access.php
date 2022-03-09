@@ -102,5 +102,11 @@ $capabilities = array(
         'contextlevel' => CONTEXT_SYSTEM,
         'clonepermissionsfrom' => 'moodle/site:uploadusers'
     ),
+    'local/keyuser:roleassign' => array(
 
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL | RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'clonepermissionsfrom' => 'moodle/role:assign'
+    ),
 );
