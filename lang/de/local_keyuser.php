@@ -48,6 +48,8 @@ $string['keyuser:cohortmanage'] = get_string('cohort:manage','role');
 $string['keyuser:cohortview'] = get_string('cohort:view','role');
 $string['keyuser:cohortassign'] = get_string('cohort:assign','role');
 
+$string['keyuser:roleassign'] = get_string('role:assign','role');
+
 $string['heading_checkmoodlechanges'] = "Überprüfe Moodle-Dateien auf Änderungen";
 $string['link_checkmoodlechanges'] = "Moodle-Dateien auf Änderungen überprüfen";
 $string['heading_changedfilescount'] = '{$a} Dateien haben sich geändert:';
