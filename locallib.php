@@ -186,6 +186,7 @@ class keyuser_config {
      public $cohort_prefix_default = [];
      public $cohort_prefix_multi_default = [];
      public $no_prefix_allowed = false;
+     public $roles_enabled = [];
 
      function __construct(){
         global $DB,$USER;
@@ -207,6 +208,18 @@ class keyuser_config {
         if(property_exists($this->_cfg,'cohortprefixfieldsmultidefault') && $this->_cfg->cohortprefixfieldsmultidefault){
             $this->cohort_prefix_multi_default = explode(",",$this->_cfg->cohortprefixfieldsmultidefault);
         }
+
+        //actually we think, any keyuser should have the permission to update users
+        array_filter(get_roles_with_capability("local/keyuser:userupdate", CAP_ALLOW, context_system::instance()), 
+            function($var){
+                $this->roles_enabled[$var->id] = $var->id;
+            });
+        //or at least view the cohorts
+        array_filter(get_roles_with_capability("local/keyuser:cohortview", CAP_ALLOW, context_system::instance()),
+            function($var){
+                $this->roles_enabled[$var->id] = $var->id;
+            });
+
         //$roles = $DB->get_records('role_assignments', ['userid' => $USER->id]);
         $roles = get_user_roles(context_system::instance(), $USER->id);
         foreach($roles as $role){
@@ -261,6 +274,22 @@ unset($KEYUSER_CFG);
 global $KEYUSER_CFG;
 $KEYUSER_CFG = new keyuser_config();
 
+function get_keyusers($ignore_self = false){
+    global $KEYUSER_CFG,$DB,$USER;
+    list($insql, $params) = $DB->get_in_or_equal($KEYUSER_CFG->roles_enabled, SQL_PARAMS_NAMED, 'roleid');
+    $params['contextid'] = context_system::instance()->id;
+    $wheresql = " WHERE ra.contextid = :contextid AND ra.roleid " . $insql;
+    if($ignore_self){
+        $wheresql .= " AND u.id != :self_userid ";
+        $params["self_userid"] = $USER->id;
+    }
+    $wheresql .= " AND " . keyuser_user_where($params,'u');
+    $sql = 'SELECT u.* FROM {user} u JOIN {role_assignments} ra on u.id = ra.userid'.$wheresql;
+
+    $keyusers = $DB->get_records_sql($sql, $params);
+    return $keyusers;
+}
+
 function keyuser_user_where(&$params,$usertable=null){
     global $DB,$USER,$KEYUSER_CFG,$SESSION;
     $sql = ($usertable?$usertable.".":"")."id IN (SELECT userid FROM (SELECT userid,count(userid) as cnt FROM {user_info_data} WHERE";
@@ -280,19 +309,14 @@ function keyuser_user_where(&$params,$usertable=null){
             }
             $wheresql .= " AND json_valid({user_info_data}.data) AND (";
             if(empty($keyuser_linkedfield)){
-                $count = 0;
-                foreach($fieldvalue as $value){
-                    $wheresql .= ($count?" OR ":"")."json_contains({user_info_data}.data->'$',:data".$field->id.$count.",'$')";
-                    $params["data".$field->id.$count] = "[\"".$value."\"]";
-                    $count++;
-                }
-                $wheresql .= "))";
+                $keyuser_linkedfield = $USER->profile[$field->shortname];
             } else {
-                $wheresql .= "json_contains({user_info_data}.data->'$',:data".$field->id.",'$')))";
-                $params["data".$field->id] = "[\"".$keyuser_linkedfield."\"]";
+                $keyuser_linkedfield = "[\"".$keyuser_linkedfield."\"]";
             }
+            $wheresql .= "JSON_OVERLAPS({user_info_data}.data,:data".$field->id.")))";
+            $params["data".$field->id] = $keyuser_linkedfield;
         } else {
-            $wheresql .= " AND ".$DB->sql_like('data',':data'.$field->id).")";
+            $wheresql .= " AND data = :data".$field->id.")";
             $params["data".$field->id] = $DB->sql_like_escape(is_array($fieldvalue)?json_encode($fieldvalue):$fieldvalue);
         }
         $has_empty_field = $has_empty_field || empty($fieldvalue);
@@ -464,7 +488,7 @@ function keyuser_cohort_prefix_select($url='index.php'){
     $result = "";
     foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
         $fieldvalue = $USER->profile[$field->shortname];
-        if(keyuser_is_multivalue($field,$fieldvalue,$KEYUSER_CFG->cohort_prefix_fieldsmulti)){
+        if(keyuser_is_multivalue($field,$fieldvalue,$KEYUSER_CFG->cohort_prefix_fieldsmulti) && count($fieldvalue) > 1){
             $inputname = 'keyuser_prefix_'.$field->id;
             $keyuser_prefix = optional_param($inputname, "", PARAM_TEXT);
             if(empty($keyuser_prefix) && array_key_exists($inputname,$SESSION)){
@@ -483,6 +507,10 @@ function keyuser_cohort_prefix_select($url='index.php'){
                 'options' => [],
             ];
             foreach($fieldvalue as $value){
+                if(!$keyuser_prefix){
+                    $keyuser_prefix = $value;
+                    $SESSION->$inputname = $keyuser_prefix;
+                }
                 $data['options'][] = [
                     'value' => $value,
                     'name' => $value,
@@ -501,7 +529,7 @@ function keyuser_linkedfield_select($url='user.php'){
     $result = "";
     foreach($KEYUSER_CFG->linked_fields as $field){
         $fieldvalue = $USER->profile[$field->shortname];
-        if(keyuser_is_multivalue($field,$fieldvalue,$KEYUSER_CFG->linked_fieldsmulti)){
+        if(keyuser_is_multivalue($field,$fieldvalue,$KEYUSER_CFG->linked_fieldsmulti) && count($fieldvalue)>1){
             $inputname = 'keyuser_linkedfield_'.$field->id;
             $keyuser_linkedfield = optional_param($inputname, "", PARAM_TEXT);
             if(empty($keyuser_linkedfield) && !isset($_POST[$inputname]) && array_key_exists($inputname,$SESSION)){
@@ -543,6 +571,6 @@ function keyuser_is_multivalue($field,&$value,$multiconfig){
     } elseif ($err === JSON_ERROR_SYNTAX) {
         $value = $USER->profile[$field->shortname];
     }
-    return is_array($value) && in_array($field->id,$multiconfig) && count($value)>1;
+    return is_array($value) && in_array($field->id,$multiconfig);
 }
 

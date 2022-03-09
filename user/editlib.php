@@ -245,8 +245,8 @@ function keyuser_useredit_shared_definition(&$mform, $editoroptions, $filemanage
  * @param moodleform $mform instance of the moodleform class
  * @param int $userid id of user whose profile is being edited.
  */
-function keyuser_profile_definition($mform, $userid = 0, $overrides = []) {
-    global $KEYUSER_CFG;
+function keyuser_profile_definition($mform, $userid=0, $overrides = []) {
+    global $KEYUSER_CFG,$USER;
     $categories = profile_get_user_fields_with_data_by_category($userid);
     foreach ($categories as $categoryid => $fields) {
         // Check first if *any* fields will be displayed.
@@ -272,8 +272,11 @@ function keyuser_profile_definition($mform, $userid = 0, $overrides = []) {
                 $fieldvalue = $formfield->data;
                 if(!keyuser_is_multivalue($formfield->field,$fieldvalue,$KEYUSER_CFG->linked_fieldsmulti)){
                     $mform->hardFreeze($formfield->inputname);
+                    $mform->setConstant($formfield->inputname, $fieldvalue);
+                } elseif($USER->id == $userid){
+                    $mform->hardFreeze($formfield->inputname);
+                    $mform->setConstant($formfield->inputname, $fieldvalue);
                 }
-                $mform->setConstant($formfield->inputname, $fieldvalue);
             }
         }
     }
