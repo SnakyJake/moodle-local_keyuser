@@ -366,7 +366,10 @@ function keyuser_cohort_get_prefix(){
             } else {
                 $SESSION->$inputname = $keyuser_prefix;
             }
-            $prefix .= $SESSION->$inputname."_";
+            if(empty($keyuser_prefix)){
+                $keyuser_prefix = $fieldvalue[0];
+            }
+            $prefix .= $keyuser_prefix."_";
         } else {
             $prefix .= (is_array($fieldvalue)?implode("_",$fieldvalue):$fieldvalue)."_";
         }
@@ -393,7 +396,10 @@ function keyuser_cohort_get_prefix_regexp(){
             } else {
                 $SESSION->$inputname = $keyuser_prefix;
             }
-            $prefix .= $SESSION->$inputname."_(r_)*";
+            if(empty($keyuser_prefix)){
+                $keyuser_prefix = $fieldvalue[0];
+            }
+            $prefix .= $keyuser_prefix."_(r_)*";
         } else {
             $prefix .= (is_array($fieldvalue)?implode("_(r_)*",$fieldvalue):$fieldvalue)."_(r_)*";
         }
@@ -402,7 +408,7 @@ function keyuser_cohort_get_prefix_regexp(){
 }
 
 function keyuser_cohort_where(&$params){
-    global $KEYUSER_CFG,$DB,$USER,$SESSION;
+    global $KEYUSER_CFG;
 
     $prefix_regexp = keyuser_cohort_get_prefix_regexp();
 
@@ -413,33 +419,6 @@ function keyuser_cohort_where(&$params){
     return "idnumber REGEXP(:prefix)";
 }
 
-function keyuser_cohort_add_prefix2(&$cohortname,$fixexisting=false){
-    global $KEYUSER_CFG,$DB;
-
-    $prefix = keyuser_cohort_get_prefix();
-    if($prefix){
-        if($fixexisting){
-            $tmp = $cohortname;
-            keyuser_cohort_remove_prefix($tmp);
-            $sql = "SELECT id FROM {cohort} c ";
-            $wheresql = "WHERE ".$DB->sql_like("c.name",":cname");
-            if($DB->record_exists_sql($sql . $wheresql,["cname"=>$prefix.$tmp."%"]))
-            {
-                $cohortname = $prefix . $tmp;
-
-            } else {
-                if($DB->record_exists_sql($sql . $wheresql,["cname"=>$prefix."r_".$tmp."%"]))
-                {
-                    $cohortname = $prefix . "r_" . $tmp;
-                }
-            }
-        } else if(substr($cohortname, 0, strlen($prefix)) != $prefix){
-            $cohortname = $prefix . $cohortname;
-        }
-        return true;
-    }
-    return $KEYUSER_CFG->no_prefix_allowed?true:false;
-}                                                                                                                                                                              
 function keyuser_cohort_add_prefix(&$cohortname,$fixexisting=false){
     global $KEYUSER_CFG,$DB;
 
