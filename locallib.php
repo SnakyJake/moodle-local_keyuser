@@ -462,6 +462,24 @@ function keyuser_cohort_remove_prefix(&$cohortname){
     return $KEYUSER_CFG->no_prefix_allowed?true:false;
 }
 
+function keyuser_cohort_prefix_options_for_select(){
+    global $KEYUSER_CFG,$USER,$SESSION;
+    $options = [];
+    foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
+        $inputname = 'keyuser_prefix_'.$field->id;
+        $fieldvalue = $USER->profile[$field->shortname];
+        $keyuser_prefix = optional_param($inputname, "", PARAM_TEXT);
+        if(empty($keyuser_prefix) && array_key_exists($inputname,$SESSION)){
+            $keyuser_prefix = $SESSION->$inputname;
+        } else {
+            $SESSION->$inputname = $keyuser_prefix;
+        }
+        keyuser_is_multivalue($field,$fieldvalue,$KEYUSER_CFG->cohort_prefix_fieldsmulti);
+        $options[$inputname] = is_array($fieldvalue)?array_combine($fieldvalue,$fieldvalue):$fieldvalue;
+    }
+    return $options;
+}
+
 function keyuser_cohort_prefix_select($url='index.php'){
     global $OUTPUT,$KEYUSER_CFG,$USER,$SESSION;
     $result = "";
