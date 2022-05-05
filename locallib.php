@@ -340,8 +340,8 @@ function keyuser_cohort_is_readonly($cohortname){
     $prefix_regexp = keyuser_cohort_get_prefix_regexp();
 
     if($prefix_regexp){
-        if(preg_match("/".$prefix_regexp."(.*)/",$cohortname,$matches) === 1){
-            return prev($matches) == "r_";
+        if(preg_match("/".$prefix_regexp.".*/",$cohortname,$matches) === 1){
+            return count($matches) > 1;
         }
     }
     return true;
@@ -399,9 +399,9 @@ function keyuser_cohort_get_prefix_regexp(){
             if(empty($keyuser_prefix)){
                 $keyuser_prefix = $fieldvalue[0];
             }
-            $prefix .= $keyuser_prefix."_(r_)*";
+            $prefix .= $keyuser_prefix."_(r_)?";
         } else {
-            $prefix .= (is_array($fieldvalue)?implode("_(r_)*",$fieldvalue):$fieldvalue)."_(r_)*";
+            $prefix .= (is_array($fieldvalue)?implode("_(r_)?",$fieldvalue):$fieldvalue)."_(r_)?";
         }
     }
     return $prefix?"^".$prefix:'';
