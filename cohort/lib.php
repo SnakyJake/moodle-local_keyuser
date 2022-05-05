@@ -112,8 +112,8 @@ function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') 
         $totalcohorts = $DB->count_records_sql($countfields . $sql . $wheresql, $params);
     }
 
-    $prefixlen = strlen(keyuser_cohort_get_prefix())+1;
-    $order = " ORDER BY SUBSTRING(name,".$prefixlen."+(INSTR(SUBSTRING(name,".$prefixlen.",2),'r_')*2))";
+    $prefix_regexp = keyuser_cohort_get_prefix_regexp();
+    $order = " ORDER BY REGEXP_REPLACE(name,\"".$prefix_regexp."\",\"\")";
 
     $cohorts = $DB->get_records_sql($fields . $sql . $wheresql . $order, $params, $page*$perpage, $perpage);
 
