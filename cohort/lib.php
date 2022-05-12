@@ -41,35 +41,28 @@ require_once($CFG->dirroot . '/cohort/lib.php');
 function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $search = '') {
     global $DB;
 
-    $fields = "SELECT *";
+    $fields = "SELECT *, SUBSTRING(idnumber, LENGTH(prefix)+1) as suffix, INSTR(prefix, '_r_') > 0 as readonly";
     $countfields = "SELECT COUNT(1)";
-    $sql = " FROM {cohort}";
-    $wheresql = " WHERE contextid = :contextid";
-    $params = array('contextid' => $contextid);
+    $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
+                     FROM {cohort}
+                    WHERE contextid = :contextid";
+    $having = " HAVING prefix) as c";
+    $params = array('prefix' => keyuser_cohort_get_prefix_regexp(), 'contextid' => $contextid);
+    $order = " ORDER BY suffix ASC";
 
-    $prefixlen = strlen(keyuser_cohort_get_prefix())+1;
-    $order = " ORDER BY SUBSTRING(name,".$prefixlen."+(INSTR(SUBSTRING(name,".$prefixlen.",2),'r_')*2))";
-
-    keyuser_cohort_append_where($wheresql,$params);
-
-    $searchwheresql = "";
-    $searchparams = [];
+    $totalcohorts = $allcohorts = $DB->count_records_sql($countfields . $sql . $having, $params);
 
     if (!empty($search)) {
         list($searchcondition, $searchparams) = cohort_get_search_query($search);
-        $searchwheresql = ' AND ' . $searchcondition;
+        $sql .= ' AND ' . $searchcondition;
+        $params = array_merge($params, $searchparams);
     }
-    $searchparams = array_merge($params, $searchparams);
 
-    $totalcohorts = $allcohorts = $DB->count_records_sql($countfields . $sql . $wheresql, $params);
     if (!empty($search)) {
-        $totalcohorts = $DB->count_records_sql($countfields . $sql . $wheresql . $searchwheresql, $searchparams);
+        $totalcohorts = $DB->count_records_sql($countfields . $sql . $having, $params);
     }
-    $cohorts = $DB->get_records_sql($fields . $sql . $wheresql . $searchwheresql . $order, $searchparams, $page*$perpage, $perpage);
+    $cohorts = $DB->get_records_sql($fields . $sql . $having . $order, $params, $page*$perpage, $perpage);
 
-    foreach(array_keys($cohorts) as $key){
-        $cohorts[$key]->readonly = keyuser_cohort_is_readonly($cohorts[$key]->idnumber);
-    }
     return array('totalcohorts' => $totalcohorts, 'cohorts' => $cohorts, 'allcohorts' => $allcohorts);
 }
 
@@ -88,12 +81,14 @@ function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $searc
 function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') {
     global $DB;
 
-    $fields = "SELECT c.*, ".context_helper::get_preload_record_columns_sql('ctx');
+    $fields = "SELECT c.*, SUBSTRING(idnumber, LENGTH(prefix)+1) as suffix, INSTR(prefix, '_r_') > 0 as readonly, ".context_helper::get_preload_record_columns_sql('ctx');
     $countfields = "SELECT COUNT(*)";
-    $sql = " FROM {cohort} c
-             JOIN {context} ctx ON ctx.id = c.contextid ";
-    $params = array();
-    $wheresql = '';
+    $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
+                     FROM {cohort}";
+    $having = " HAVING prefix) as c";
+    $join = " JOIN {context} ctx ON ctx.id = c.contextid ";
+    $params = array('prefix' => keyuser_cohort_get_prefix_regexp());
+	$wheresql = '';
 
     if ($excludedcontexts = cohort_get_invisible_contexts()) {
         list($excludedsql, $excludedparams) = $DB->get_in_or_equal($excludedcontexts, SQL_PARAMS_NAMED, 'excl', false);
@@ -101,26 +96,21 @@ function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') 
         $params = array_merge($params, $excludedparams);
     }
 
-    keyuser_cohort_append_where($wheresql,$params);
-
-    $totalcohorts = $allcohorts = $DB->count_records_sql($countfields . $sql . $wheresql, $params);
+    $totalcohorts = $allcohorts = $DB->count_records_sql($countfields . $sql . $wheresql . $having . $join, $params);
 
     if (!empty($search)) {
         list($searchcondition, $searchparams) = cohort_get_search_query($search, 'c');
         $wheresql .= ($wheresql ? ' AND ' : ' WHERE ') . $searchcondition;
         $params = array_merge($params, $searchparams);
-        $totalcohorts = $DB->count_records_sql($countfields . $sql . $wheresql, $params);
+        $totalcohorts = $DB->count_records_sql($countfields . $sql . $wheresql . $having . $join, $params);
     }
 
-    $prefix_regexp = keyuser_cohort_get_prefix_regexp();
-    $order = " ORDER BY REGEXP_REPLACE(name,\"".$prefix_regexp."\",\"\")";
-
-    $cohorts = $DB->get_records_sql($fields . $sql . $wheresql . $order, $params, $page*$perpage, $perpage);
+    $order = " ORDER BY suffix ASC";
+    $cohorts = $DB->get_records_sql($fields . $sql . $wheresql . $having . $join . $order, $params, $page*$perpage, $perpage);
 
     // Preload used contexts, they will be used to check view/manage/assign capabilities and display categories names.
     foreach (array_keys($cohorts) as $key) {
         context_helper::preload_from_record($cohorts[$key]);
-        $cohorts[$key]->readonly = keyuser_cohort_is_readonly($cohorts[$key]->idnumber);
     }
 
     return array('totalcohorts' => $totalcohorts, 'cohorts' => $cohorts, 'allcohorts' => $allcohorts);
@@ -246,7 +236,7 @@ function keyuser_cohort_edit_controls(context $context, moodle_url $currenturl) 
          *     $currenttab = 'viewall';
          * }
          */
-    } else { 
+    } else {
         $tabs[] = new tabobject('view', $viewurl, get_string('cohorts', 'cohort'));
     }
     if (has_capability('local/keyuser:cohortmanage', $context)) {

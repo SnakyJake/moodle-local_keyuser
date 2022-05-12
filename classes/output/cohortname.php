@@ -43,9 +43,8 @@ class cohortname extends \core\output\inplace_editable {
      */
     public function __construct($cohort) {
         $cohortcontext = \context::instance_by_id($cohort->contextid);
-        $editable = \has_capability('local/keyuser:cohortmanage', $cohortcontext) && !keyuser_cohort_is_readonly($cohort->idnumber);
-        $name = $cohort->name;
-        \keyuser_cohort_remove_prefix($name);
+        $editable = \has_capability('local/keyuser:cohortmanage', $cohortcontext) && !$cohort->readonly;
+        $name = $cohort->suffix;
         $displayvalue = format_string($name, true, array('context' => $cohortcontext));
         parent::__construct('local_keyuser', 'cohortname', $cohort->id, $editable,
             $displayvalue,

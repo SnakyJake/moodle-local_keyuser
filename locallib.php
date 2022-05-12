@@ -380,7 +380,7 @@ function keyuser_cohort_get_prefix(){
 function keyuser_cohort_get_prefix_regexp(){
     global $KEYUSER_CFG,$USER,$SESSION;
 
-    $prefix = '';
+    $prefix = '^';
     foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
         if(empty($USER->profile[$field->shortname])){
             //disable "no_prefix_allowed" if prefix fields are chosen!
@@ -404,7 +404,7 @@ function keyuser_cohort_get_prefix_regexp(){
             $prefix .= (is_array($fieldvalue)?implode("_(r_)?",$fieldvalue):$fieldvalue)."_(r_)?";
         }
     }
-    return $prefix?"^".$prefix:'';
+    return $prefix;
 }
 
 function keyuser_cohort_where(&$params){
