@@ -423,9 +423,6 @@ class local_keyuser_cohort_external extends external_api {
                 external_format_text($cohort->description, $cohort->descriptionformat,
                         $cohortcontext->id, 'cohort', 'description', $cohort->id);
 
-            keyuser_cohort_remove_prefix($cohort->name);
-            keyuser_cohort_remove_prefix($cohort->idnumber);
-
             $cohorts[$key] = $cohort;
         }
 
