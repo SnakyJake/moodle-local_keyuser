@@ -40,15 +40,21 @@ require_once($CFG->dirroot . '/cohort/lib.php');
  */
 function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $search = '') {
     global $DB;
-
-    $fields = "SELECT *, SUBSTRING(idnumber, LENGTH(prefix)+1) as suffix, INSTR(prefix, '_r_') > 0 as readonly";
+/*
+    $columns = $DB->get_columns('cohort');
+    unset($columns['name']);
+    unset($columns['idnumber']);
+    $str = implode(", ", array_keys($columns));
+    print($str);
+*/
+    $fields = "SELECT id, contextid, SUBSTRING(idnumber, LENGTH(prefix)+1) as name, SUBSTRING(idnumber, LENGTH(prefix)+1) as idnumber, description, descriptionformat, visible, component, timecreated, timemodified, theme, name as fullname, idnumber as fullidnumber, INSTR(prefix, '_r_') > 0 as readonly";
     $countfields = "SELECT COUNT(1)";
     $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
                      FROM {cohort}
                     WHERE contextid = :contextid";
     $having = " HAVING prefix) as c";
     $params = array('prefix' => keyuser_cohort_get_prefix_regexp(), 'contextid' => $contextid);
-    $order = " ORDER BY suffix ASC";
+    $order = " ORDER BY name ASC, idnumber ASC";
 
     $totalcohorts = $allcohorts = $DB->count_records_sql($countfields . $sql . $having, $params);
 
@@ -81,14 +87,14 @@ function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $searc
 function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') {
     global $DB;
 
-    $fields = "SELECT c.*, SUBSTRING(idnumber, LENGTH(prefix)+1) as suffix, INSTR(prefix, '_r_') > 0 as readonly, ".context_helper::get_preload_record_columns_sql('ctx');
+    $fields = "SELECT id, contextid, SUBSTRING(idnumber, LENGTH(prefix)+1) as name, SUBSTRING(idnumber, LENGTH(prefix)+1) as idnumber, description, descriptionformat, visible, component, timecreated, timemodified, theme, name as fullname, idnumber as fullidnumber, INSTR(prefix, '_r_') > 0 as readonly, ".context_helper::get_preload_record_columns_sql('ctx');
     $countfields = "SELECT COUNT(*)";
     $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
                      FROM {cohort}";
     $having = " HAVING prefix) as c";
     $join = " JOIN {context} ctx ON ctx.id = c.contextid ";
     $params = array('prefix' => keyuser_cohort_get_prefix_regexp());
-	$wheresql = '';
+    $wheresql = '';
 
     if ($excludedcontexts = cohort_get_invisible_contexts()) {
         list($excludedsql, $excludedparams) = $DB->get_in_or_equal($excludedcontexts, SQL_PARAMS_NAMED, 'excl', false);
