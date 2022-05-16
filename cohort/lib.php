@@ -27,21 +27,29 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/cohort/lib.php');
 
 /**
+ * Add new cohort.
+ *
+ * @param  stdClass $cohort
+ * @return int new cohort id
+ */
+function keyuser_cohort_add_cohort($cohort) {
+    if (keyuser_cohort_add_prefix($cohort->name)) {
+        $cohort->idnumber = $cohort->name;
+        return cohort_add_cohort($cohort);
+    }
+    return -1;
+}
+
+/**
  * Update existing cohort.
  * @param  stdClass $cohort
  * @return void
  */
 function keyuser_cohort_update_cohort($cohort) {
-    // Update name?
-    if (!empty($cohort->name)) {
-        if ($prefix = keyuser_cohort_get_prefix()) {
-            $cohort->name = $prefix . $cohort->name;
-            $cohort->idnumber = $cohort->name;
-        } else {
-            return;
-        }
+    if (keyuser_cohort_add_prefix($cohort->name)) {
+        $cohort->idnumber = $cohort->name;
+        return cohort_update_cohort($cohort);
     }
-    return cohort_update_cohort($cohort);
 }
 
 /**

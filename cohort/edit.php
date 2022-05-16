@@ -171,7 +171,7 @@ if ($editform->is_cancelled()) {
             $data->idnumber = $data->name;
             $data->descriptionformat = $data->description_editor['format'];
             $data->description = $description = $data->description_editor['text'];
-            $data->id = cohort_add_cohort($data);
+            $data->id = keyuser_cohort_add_cohort($data);
             $editoroptions['context'] = $context = context::instance_by_id($data->contextid);
             $data = file_postupdate_standard_editor($data, 'description', $editoroptions,
                     $context, 'cohort', 'description', $data->id);
