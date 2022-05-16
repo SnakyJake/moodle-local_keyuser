@@ -158,7 +158,6 @@ if ($editform->is_cancelled()) {
         $editoroptions['context'] = $context = context::instance_by_id($data->contextid);
 
         if ($data->id) {
-            keyuser_cohort_add_prefix($data->name);
             $data->idnumber = $data->name;
             if ($data->contextid != $oldcontextid) {
                 // Cohort was moved to another context.
@@ -167,9 +166,8 @@ if ($editform->is_cancelled()) {
             }
             $data = file_postupdate_standard_editor($data, 'description', $editoroptions,
                     $context, 'cohort', 'description', $data->id);
-            cohort_update_cohort($data);
+            keyuser_cohort_update_cohort($data);
         } else {
-            keyuser_cohort_add_prefix($data->name);
             $data->idnumber = $data->name;
             $data->descriptionformat = $data->description_editor['format'];
             $data->description = $description = $data->description_editor['text'];
@@ -180,7 +178,7 @@ if ($editform->is_cancelled()) {
             if ($description != $data->description) {
                 $updatedata = (object)array('id' => $data->id,
                     'description' => $data->description, 'contextid' => $context->id);
-                cohort_update_cohort($updatedata);
+                keyuser_cohort_update_cohort($updatedata);
             }
         }
 

@@ -27,6 +27,24 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/cohort/lib.php');
 
 /**
+ * Update existing cohort.
+ * @param  stdClass $cohort
+ * @return void
+ */
+function keyuser_cohort_update_cohort($cohort) {
+    // Update name?
+    if (!empty($cohort->name)) {
+        if ($prefix = keyuser_cohort_get_prefix()) {
+            $cohort->name = $prefix . $cohort->name;
+            $cohort->idnumber = $cohort->name;
+        } else {
+            return;
+        }
+    }
+    return cohort_update_cohort($cohort);
+}
+
+/**
  * Get all the cohorts defined in given context.
  *
  * The function does not check user capability to view/manage cohorts in the given context

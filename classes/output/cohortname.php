@@ -24,7 +24,7 @@
 
 namespace local_keyuser\output;
 
-require_once($CFG->dirroot.'/local/keyuser/locallib.php');
+require_once($CFG->dirroot.'/local/keyuser/cohort/lib.php');
 
 use lang_string;
 
@@ -44,11 +44,10 @@ class cohortname extends \core\output\inplace_editable {
     public function __construct($cohort) {
         $cohortcontext = \context::instance_by_id($cohort->contextid);
         $editable = \has_capability('local/keyuser:cohortmanage', $cohortcontext) && !$cohort->readonly;
-        $name = $cohort->suffix;
-        $displayvalue = format_string($name, true, array('context' => $cohortcontext));
+        $displayvalue = format_string($cohort->name, true, array('context' => $cohortcontext));
         parent::__construct('local_keyuser', 'cohortname', $cohort->id, $editable,
             $displayvalue,
-            $name,
+            $cohort->name,
             new lang_string('editcohortname', 'cohort'),
             new lang_string('newnamefor', 'cohort', $displayvalue));
     }
@@ -62,25 +61,14 @@ class cohortname extends \core\output\inplace_editable {
      */
     public static function update($cohortid, $newvalue) {
         global $DB;
-
-        $sql = "SELECT * FROM {cohort} ";
-        $wheresql = "WHERE id = :id";
-        $params["id"]=$cohortid;
-    
-        \keyuser_cohort_append_where($wheresql,$params);
-
-        $cohort = $DB->get_record_sql($sql . $wheresql, $params);
+        $cohort = $DB->get_record('cohort', array('id' => $cohortid), '*', MUST_EXIST);
         $cohortcontext = \context::instance_by_id($cohort->contextid);
         \external_api::validate_context($cohortcontext);
         \require_capability('local/keyuser:cohortmanage', $cohortcontext);
-        if(!clean_param($newvalue, PARAM_TEXT)){
-            $newvalue = $cohort->name;
-        }
-        \keyuser_cohort_add_prefix($newvalue);
         $newvalue = clean_param($newvalue, PARAM_TEXT);
         if (strval($newvalue) !== '') {
-            $record = (object)array('id' => $cohort->id, 'name' => $newvalue, 'idnumber' => $newvalue, 'contextid' => $cohort->contextid);
-            \cohort_update_cohort($record);
+            $record = (object)array('id' => $cohort->id, 'name' => $newvalue, 'contextid' => $cohort->contextid);
+            keyuser_cohort_update_cohort($record);
             $cohort->name = $newvalue;
             $cohort->idnumber = $newvalue;
         }
