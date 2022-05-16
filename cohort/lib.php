@@ -78,7 +78,7 @@ function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $searc
     $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
                      FROM {cohort}
                     WHERE contextid = :contextid";
-    $having = " HAVING prefix) as c";
+    $having = " HAVING prefix) c";
     $params = array('prefix' => keyuser_cohort_get_prefix_regexp(), 'contextid' => $contextid);
     $order = " ORDER BY name ASC, idnumber ASC";
 
@@ -117,7 +117,7 @@ function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') 
     $countfields = "SELECT COUNT(*)";
     $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
                      FROM {cohort}";
-    $having = " HAVING prefix) as c";
+    $having = " HAVING prefix) c";
     $join = " JOIN {context} ctx ON ctx.id = c.contextid ";
     $params = array('prefix' => keyuser_cohort_get_prefix_regexp());
     $wheresql = '';
@@ -244,6 +244,9 @@ function keyuser_cohort_get_available_cohorts($currentcontext, $withmembers = 0,
 
     return $DB->get_records_sql($sql, $params, $offset, $limit);
 }
+
+// cohort_get_cohort() and cohort_get_user_cohorts() need no implementation
+// They are not called anywhere
 
 /**
  * Returns navigation controls (tabtree) to be displayed on cohort management pages
