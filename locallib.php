@@ -296,6 +296,9 @@ function keyuser_user_where(&$params,$usertable=null){
     $wheresql = '';
     $has_empty_field = false;
     foreach($KEYUSER_CFG->linked_fields as $field){
+        if(!array_key_exists($field->shortname,$USER->profile)){
+            break;
+        }
         $wheresql .= ($wheresql ? " OR " : "")." (fieldid=:fieldid".$field->id;
         $params["fieldid".$field->id] = $field->id;
         $fieldvalue = $USER->profile[$field->shortname];
