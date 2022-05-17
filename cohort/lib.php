@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/cohort/lib.php');
 
 /**
- * Add new cohort.
+ * Add new keyuser_cohort.
  *
  * @param  stdClass $cohort
  * @return int new cohort id
@@ -41,7 +41,8 @@ function keyuser_cohort_add_cohort($cohort) {
 }
 
 /**
- * Update existing cohort.
+ * Update existing keyuser_cohort.
+ *
  * @param  stdClass $cohort
  * @return void
  */
@@ -53,10 +54,10 @@ function keyuser_cohort_update_cohort($cohort) {
 }
 
 /**
- * Return a single keyuser cohort as an object where the $id and keyuser conditions are met.
+ * Return a single keyuser_cohort as an object where the $id and keyuser conditions are met.
  *
  * @param  int $id
- * @return stdClass $cohort
+ * @return stdClass keyuser_cohort
  */
 function keyuser_cohort_get_record($id) {
     global $DB;
@@ -72,10 +73,9 @@ function keyuser_cohort_get_record($id) {
 }
 
 /**
- * Return a single keyuser cohort as an object where the $id and keyuser conditions are met.
+ * Get all keyuser_cohorts as an array.
  *
- * @param  int $id
- * @return stdClass $cohort
+ * @return array of keyuser_cohorts
  */
 function keyuser_cohort_get_records() {
     global $DB;
@@ -91,20 +91,20 @@ function keyuser_cohort_get_records() {
 }
 
 /**
- * Test whether a keyuser cohort exists with given idnumber.
+ * Test whether a keyuser_cohort exists with given idnumber.
  *
- * @param  int $id
- * @return stdClass cohort
+ * @param  int $idnumber
+ * @return bool true if a keyuser_cohort with given idnumber exists, else false
  */
-function keyuser_cohort_idnumber_record_exists($idnumber) {
+function keyuser_cohort_record_exists($idnumber) {
     global $DB;
 
-	keyuser_cohort_add_prefix($idnumber);
+    keyuser_cohort_add_prefix($idnumber);
     return $DB->record_exists('cohort', array('idnumber' => $idnumber));
 }
 
 /**
- * Get all the cohorts defined in given context.
+ * Get all the keyuser_cohorts defined in given context.
  *
  * The function does not check user capability to view/manage cohorts in the given context
  * assuming that it has been already verified.
@@ -113,7 +113,7 @@ function keyuser_cohort_idnumber_record_exists($idnumber) {
  * @param int $page number of the current page
  * @param int $perpage items per page
  * @param string $search search string
- * @return array    Array(totalcohorts => int, cohorts => array, allcohorts => int)
+ * @return array    Array(totalcohorts => int, keyuser_cohorts => array, allcohorts => int)
  */
 function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $search = '') {
     global $DB;
@@ -150,7 +150,7 @@ function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $searc
 }
 
 /**
- * Get all the cohorts defined anywhere in system.
+ * Get all the keyuser_cohorts defined anywhere in system.
  *
  * The function assumes that user capability to view/manage cohorts on system level
  * has already been verified. This function only checks if such capabilities have been
@@ -159,7 +159,7 @@ function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $searc
  * @param int $page number of the current page
  * @param int $perpage items per page
  * @param string $search search string
- * @return array    Array(totalcohorts => int, cohorts => array, allcohorts => int)
+ * @return array    Array(totalcohorts => int, keyuser_cohorts => array, allcohorts => int)
  */
 function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') {
     global $DB;
@@ -200,7 +200,7 @@ function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') 
 }
 
 /**
- * Returns the list of cohorts visible to the current user in the given course.
+ * Returns the list of keyuser_cohorts visible to the current user in the given course.
  *
  * The following fields are returned in each record: id, name, contextid, idnumber, visible
  * Fields memberscnt and enrolledcnt will be also returned if requested
