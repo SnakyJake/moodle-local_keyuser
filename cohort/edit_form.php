@@ -38,7 +38,7 @@ class keyuser_cohort_edit_form extends moodleform {
         $mform = $this->_form;
         $editoroptions = $this->_customdata['editoroptions'];
         $cohort = $this->_customdata['data'];
-        keyuser_cohort_remove_prefix($cohort->name);
+        //keyuser_cohort_remove_prefix($cohort->name);
 
         $mform->addElement('text', 'name', get_string('name', 'cohort'), 'maxlength="254" size="50"');
         $mform->addRule('name', get_string('required'), 'required', null, 'client');
@@ -85,7 +85,7 @@ class keyuser_cohort_edit_form extends moodleform {
     }
 
     public function validation($data, $files) {
-        global $DB;
+        //global $DB;
 
         $errors = parent::validation($data, $files);
 
@@ -98,13 +98,13 @@ class keyuser_cohort_edit_form extends moodleform {
         if ($data['id']) {
             $current = keyuser_cohort_get_record($data['id']);
             if ($current->idnumber !== $idnumber) {
-                if ($DB->record_exists('cohort', array('idnumber'=>$idnumber))) {
+                if (keyuser_cohort_record_exists($idnumber)) {
                     $errors['idnumber'] = get_string('duplicateidnumber', 'cohort');
                 }
             }
 
         } else {
-            if ($DB->record_exists('cohort', array('idnumber'=>$idnumber))) {
+            if (keyuser_cohort_record_exists($idnumber)) {
                 $errors['idnumber'] = get_string('duplicateidnumber', 'cohort');
             }
         }

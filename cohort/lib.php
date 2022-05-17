@@ -91,6 +91,19 @@ function keyuser_cohort_get_records() {
 }
 
 /**
+ * Test whether a keyuser cohort exists with given idnumber.
+ *
+ * @param  int $id
+ * @return stdClass cohort
+ */
+function keyuser_cohort_idnumber_record_exists($idnumber) {
+    global $DB;
+
+	keyuser_cohort_add_prefix($idnumber);
+    return $DB->record_exists('cohort', array('idnumber' => $idnumber));
+}
+
+/**
  * Get all the cohorts defined in given context.
  *
  * The function does not check user capability to view/manage cohorts in the given context
