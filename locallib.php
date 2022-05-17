@@ -347,10 +347,12 @@ function keyuser_cohort_is_readonly($cohortname){
     return true;
 }
 
-function keyuser_cohort_get_prefix(){
+function keyuser_cohort_get_prefix($regexp = false){
     global $KEYUSER_CFG,$USER,$SESSION;
 
-    $prefix = '';
+    $prefix = $regexp?'^':'';
+    $divider = $regexp?"_(r_)?":"_";
+    
     foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
         if(empty($USER->profile[$field->shortname])){
             //disable "no_prefix_allowed" if prefix fields are chosen!
@@ -369,42 +371,16 @@ function keyuser_cohort_get_prefix(){
             if(empty($keyuser_prefix)){
                 $keyuser_prefix = $fieldvalue[0];
             }
-            $prefix .= $keyuser_prefix."_";
+            $prefix .= $keyuser_prefix.$divider;
         } else {
-            $prefix .= (is_array($fieldvalue)?implode("_",$fieldvalue):$fieldvalue)."_";
+            $prefix .= (is_array($fieldvalue)?implode($divider,$fieldvalue):$fieldvalue).$divider;
         }
     }
     return $prefix;
 }
 
 function keyuser_cohort_get_prefix_regexp(){
-    global $KEYUSER_CFG,$USER,$SESSION;
-
-    $prefix = '^';
-    foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
-        if(empty($USER->profile[$field->shortname])){
-            //disable "no_prefix_allowed" if prefix fields are chosen!
-            $KEYUSER_CFG->no_prefix_allowed = false;
-            return false;
-        }
-        $fieldvalue = $USER->profile[$field->shortname];
-        if(keyuser_is_multivalue($field,$fieldvalue,$KEYUSER_CFG->cohort_prefix_fieldsmulti)){
-            $inputname = 'keyuser_prefix_'.$field->id;
-            $keyuser_prefix = optional_param($inputname, "", PARAM_TEXT);
-            if(empty($keyuser_prefix) && array_key_exists($inputname,$SESSION)){
-                $keyuser_prefix = $SESSION->$inputname;
-            } else {
-                $SESSION->$inputname = $keyuser_prefix;
-            }
-            if(empty($keyuser_prefix)){
-                $keyuser_prefix = $fieldvalue[0];
-            }
-            $prefix .= $keyuser_prefix."_(r_)?";
-        } else {
-            $prefix .= (is_array($fieldvalue)?implode("_(r_)?",$fieldvalue):$fieldvalue)."_(r_)?";
-        }
-    }
-    return $prefix;
+    return keyuser_cohort_get_prefix(true);
 }
 
 function keyuser_cohort_where(&$params){
