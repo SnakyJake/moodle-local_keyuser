@@ -38,7 +38,6 @@ class keyuser_cohort_edit_form extends moodleform {
         $mform = $this->_form;
         $editoroptions = $this->_customdata['editoroptions'];
         $cohort = $this->_customdata['data'];
-        //keyuser_cohort_remove_prefix($cohort->name);
 
         $mform->addElement('text', 'name', get_string('name', 'cohort'), 'maxlength="254" size="50"');
         $mform->addRule('name', get_string('required'), 'required', null, 'client');
@@ -89,11 +88,7 @@ class keyuser_cohort_edit_form extends moodleform {
 
         $errors = parent::validation($data, $files);
 
-        $idnumber = $name = trim($data['name']);
-
-        if(!keyuser_cohort_add_prefix($idnumber) || !keyuser_cohort_add_prefix($name)){
-            $errors['name'] = get_string('error_missing_fields', 'local_keyuser');
-        }
+        $idnumber = trim($data['name']);
 
         if ($data['id']) {
             $current = keyuser_cohort_get_record($data['id']);
