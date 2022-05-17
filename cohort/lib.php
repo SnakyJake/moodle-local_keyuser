@@ -68,9 +68,26 @@ function keyuser_cohort_get_record($id) {
                    HAVING prefix) c";
     $params = array('id' => $id, 'prefix' => keyuser_cohort_get_prefix_regexp());
 
-    $cohort = $DB->get_record_sql($fields . $sql, $params, MUST_EXIST);
+    return $DB->get_record_sql($fields . $sql, $params, MUST_EXIST);
+}
 
-    return $cohort;
+/**
+ * Return a single keyuser cohort as an object where the $id and keyuser conditions are met.
+ *
+ * @param  int $id
+ * @return stdClass $cohort
+ */
+function keyuser_cohort_get_records() {
+    global $DB;
+
+    $fields = "SELECT id, contextid, SUBSTRING(idnumber, LENGTH(prefix)+1) as name, SUBSTRING(idnumber, LENGTH(prefix)+1) as idnumber, description, descriptionformat, visible, component, timecreated, timemodified, theme, name as realname, idnumber as realidnumber, INSTR(prefix, '_r_') > 0 as readonly";
+    $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
+                     FROM {cohort}
+                   HAVING prefix) c";
+    $params = array('prefix' => keyuser_cohort_get_prefix_regexp());
+    $order = " ORDER BY name ASC";
+
+    return $DB->get_records_sql($fields . $sql . $order, $params);
 }
 
 /**

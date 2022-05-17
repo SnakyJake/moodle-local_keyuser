@@ -40,13 +40,7 @@ $users = $SESSION->bulk_users;
 $strnever = get_string('never');
 
 $cohorts = array(''=>get_string('choosedots'));
-
-$wheresql = '';
-$params = [];
-keyuser_cohort_append_where($wheresql,$params);
-
-$allcohorts = $DB->get_records_sql("SELECT * FROM {cohort} " . $wheresql . ' ORDER BY name ASC', $params);
-//$allcohorts = $DB->get_records('cohort', null, 'name');
+$allcohorts = keyuser_cohort_get_records();
 
 foreach ($allcohorts as $c) {
     if (!empty($c->component)) {
@@ -67,7 +61,6 @@ foreach ($allcohorts as $c) {
     }
     */
     $cohorts[$c->id] = format_string($c->name);
-    keyuser_cohort_remove_prefix($cohorts[$c->id]);
 }
 unset($allcohorts);
 
