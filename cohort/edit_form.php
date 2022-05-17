@@ -96,14 +96,7 @@ class keyuser_cohort_edit_form extends moodleform {
         }
 
         if ($data['id']) {
-            $sql = "SELECT * FROM {cohort} ";
-            $wheresql = "WHERE id = :id";
-            $params["id"]=$data['id'];
-        
-            keyuser_cohort_append_where($wheresql,$params);
-        
-            $current = $DB->get_record_sql($sql . $wheresql, $params);
-        
+            $current = keyuser_cohort_get_record($data['id']);
             if ($current->idnumber !== $idnumber) {
                 if ($DB->record_exists('cohort', array('idnumber'=>$idnumber))) {
                     $errors['idnumber'] = get_string('duplicateidnumber', 'cohort');

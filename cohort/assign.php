@@ -31,13 +31,7 @@ $returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 
 require_login();
 
-$sql = "SELECT * FROM {cohort} ";
-$wheresql = "WHERE id = :id";
-$params["id"]=$id;
-
-keyuser_cohort_append_where($wheresql,$params);
-
-$cohort = $DB->get_record_sql($sql . $wheresql, $params);
+$cohort = keyuser_cohort_get_record($id);
 $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
 
 require_capability('local/keyuser:cohortassign', $context);
@@ -73,9 +67,7 @@ $PAGE->set_title(get_string('assigncohorts', 'cohort'));
 $PAGE->set_heading($COURSE->fullname);
 
 echo $OUTPUT->header();
-$displayname = $cohort->name;
-keyuser_cohort_remove_prefix($displayname);
-echo $OUTPUT->heading(get_string('assignto', 'cohort', format_string($displayname)));
+echo $OUTPUT->heading(get_string('assignto', 'cohort', format_string($cohort->name)));
 
 echo $OUTPUT->notification(get_string('removeuserwarning', 'core_cohort'));
 

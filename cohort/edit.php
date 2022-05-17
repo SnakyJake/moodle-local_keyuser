@@ -42,14 +42,7 @@ $contextid = context_system::instance()->id;
 
 $category = null;
 if ($id) {
-    $sql = "SELECT * FROM {cohort} ";
-    $wheresql = "WHERE id = :id";
-    $params["id"]=$id;
-
-    keyuser_cohort_append_where($wheresql,$params);
-
-    $cohort = $DB->get_record_sql($sql . $wheresql, $params);
-    $cohort->readonly = keyuser_cohort_is_readonly($cohort->idnumber);
+    $cohort = keyuser_cohort_get_record($id);
     $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
 } else {
     $context = context::instance_by_id($contextid, MUST_EXIST);
@@ -105,9 +98,7 @@ if ($delete and $cohort->id and !$cohort->readonly) {
     echo $OUTPUT->heading($strheading);
     $yesurl = new moodle_url('/local/keyuser/cohort/edit.php', array('id' => $cohort->id, 'delete' => 1,
         'confirm' => 1, 'sesskey' => sesskey(), 'returnurl' => $returnurl->out_as_local_url()));
-    $displayname = $cohort->name;
-    keyuser_cohort_remove_prefix($displayname);
-    $message = get_string('delconfirm', 'cohort', format_string($displayname));
+    $message = get_string('delconfirm', 'cohort', format_string($cohort->name));
     echo $OUTPUT->confirm($message, $yesurl, $returnurl);
     echo $OUTPUT->footer();
     die;

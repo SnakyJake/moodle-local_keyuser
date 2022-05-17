@@ -53,6 +53,27 @@ function keyuser_cohort_update_cohort($cohort) {
 }
 
 /**
+ * Return a single keyuser cohort as an object where the $id and keyuser conditions are met.
+ *
+ * @param  int $id
+ * @return stdClass $cohort
+ */
+function keyuser_cohort_get_record($id) {
+    global $DB;
+
+    $fields = "SELECT id, contextid, SUBSTRING(idnumber, LENGTH(prefix)+1) as name, SUBSTRING(idnumber, LENGTH(prefix)+1) as idnumber, description, descriptionformat, visible, component, timecreated, timemodified, theme, name as realname, idnumber as realidnumber, INSTR(prefix, '_r_') > 0 as readonly";
+    $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
+                     FROM {cohort}
+                    WHERE id = :id
+                   HAVING prefix) c";
+    $params = array('id' => $id, 'prefix' => keyuser_cohort_get_prefix_regexp());
+
+    $cohort = $DB->get_record_sql($fields . $sql, $params, MUST_EXIST);
+
+    return $cohort;
+}
+
+/**
  * Get all the cohorts defined in given context.
  *
  * The function does not check user capability to view/manage cohorts in the given context
@@ -73,7 +94,7 @@ function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $searc
     $str = implode(", ", array_keys($columns));
     print($str);
 */
-    $fields = "SELECT id, contextid, SUBSTRING(idnumber, LENGTH(prefix)+1) as name, SUBSTRING(idnumber, LENGTH(prefix)+1) as idnumber, description, descriptionformat, visible, component, timecreated, timemodified, theme, name as fullname, idnumber as fullidnumber, INSTR(prefix, '_r_') > 0 as readonly";
+    $fields = "SELECT id, contextid, SUBSTRING(idnumber, LENGTH(prefix)+1) as name, SUBSTRING(idnumber, LENGTH(prefix)+1) as idnumber, description, descriptionformat, visible, component, timecreated, timemodified, theme, name as realname, idnumber as realidnumber, INSTR(prefix, '_r_') > 0 as readonly";
     $countfields = "SELECT COUNT(1)";
     $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
                      FROM {cohort}
@@ -113,7 +134,7 @@ function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $searc
 function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') {
     global $DB;
 
-    $fields = "SELECT id, contextid, SUBSTRING(idnumber, LENGTH(prefix)+1) as name, SUBSTRING(idnumber, LENGTH(prefix)+1) as idnumber, description, descriptionformat, visible, component, timecreated, timemodified, theme, name as fullname, idnumber as fullidnumber, INSTR(prefix, '_r_') > 0 as readonly, ".context_helper::get_preload_record_columns_sql('ctx');
+    $fields = "SELECT id, contextid, SUBSTRING(idnumber, LENGTH(prefix)+1) as name, SUBSTRING(idnumber, LENGTH(prefix)+1) as idnumber, description, descriptionformat, visible, component, timecreated, timemodified, theme, name as realname, idnumber as realidnumber, INSTR(prefix, '_r_') > 0 as readonly, ".context_helper::get_preload_record_columns_sql('ctx');
     $countfields = "SELECT COUNT(*)";
     $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
                      FROM {cohort}";
