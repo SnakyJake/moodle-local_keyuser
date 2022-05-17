@@ -66,7 +66,7 @@ function keyuser_cohort_get_record($id) {
     $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
                      FROM {cohort}
                     WHERE id = :id
-                   HAVING prefix) c";
+                   HAVING prefix IS NOT NULL) c";
     $params = array('id' => $id, 'prefix' => keyuser_cohort_get_prefix_regexp());
 
     return $DB->get_record_sql($fields . $sql, $params, MUST_EXIST);
@@ -83,7 +83,7 @@ function keyuser_cohort_get_records() {
     $fields = "SELECT id, contextid, SUBSTRING(idnumber, LENGTH(prefix)+1) as name, SUBSTRING(idnumber, LENGTH(prefix)+1) as idnumber, description, descriptionformat, visible, component, timecreated, timemodified, theme, name as realname, idnumber as realidnumber, INSTR(prefix, '_r_') > 0 as readonly";
     $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
                      FROM {cohort}
-                   HAVING prefix) c";
+                   HAVING prefix IS NOT NULL) c";
     $params = array('prefix' => keyuser_cohort_get_prefix_regexp());
     $order = " ORDER BY name ASC";
 
@@ -129,7 +129,7 @@ function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $searc
     $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
                      FROM {cohort}
                     WHERE contextid = :contextid";
-    $having = " HAVING prefix) c";
+    $having = " HAVING prefix IS NOT NULL) c";
     $params = array('prefix' => keyuser_cohort_get_prefix_regexp(), 'contextid' => $contextid);
     $order = " ORDER BY name ASC, idnumber ASC";
 
@@ -168,7 +168,7 @@ function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') 
     $countfields = "SELECT COUNT(*)";
     $sql = " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
                      FROM {cohort}";
-    $having = " HAVING prefix) c";
+    $having = " HAVING prefix IS NOT NULL) c";
     $join = " JOIN {context} ctx ON ctx.id = c.contextid ";
     $params = array('prefix' => keyuser_cohort_get_prefix_regexp());
     $wheresql = '';
