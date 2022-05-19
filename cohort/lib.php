@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/cohort/lib.php');
-require_once($CFG->dirroot.'/local/keyuser/locallib.php');
+require_once($CFG->dirroot . '/local/keyuser/locallib.php');
 
 define('SELECT_KEYUSER_COHORT', "SELECT c.id, c.contextid, SUBSTRING(c.idnumber, LENGTH(c.prefix)+1) as name, SUBSTRING(c.idnumber, LENGTH(c.prefix)+1) as idnumber, c.description, c.descriptionformat, c.visible, c.component, c.timecreated, c.timemodified, c.theme, c.name as realname, c.idnumber as realidnumber, INSTR(c.prefix, '_r_') > 0 as readonly");
 define('FROM_KEYUSER_COHORT',	 " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix

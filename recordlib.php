@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once('lib.php');
+require_once(__DIR__ . '/cohort/lib.php');
 
 /**
  * Return a single keyuser_cohort as an object where the $id and keyuser conditions are met.

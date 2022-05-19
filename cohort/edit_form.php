@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/lib/formslib.php');
-require_once($CFG->dirroot . '/local/keyuser/cohort/recordlib.php');
+require_once($CFG->dirroot . '/local/keyuser/recordlib.php');
 
 class keyuser_cohort_edit_form extends moodleform {
 
