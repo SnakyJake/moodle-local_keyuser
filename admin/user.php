@@ -233,7 +233,7 @@
     // Get all user name fields as an array, but with firstname and lastname first.
     $allusernamefields = \core_user\fields::get_name_fields(true);
     $columns = array_merge($allusernamefields, $extracolumns, $requiredcolumns);
-	
+    
     foreach ($columns as $column) {
         $string[$column] = \core_user\fields::get_display_name($column);
         if ($sort != $column) {

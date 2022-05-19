@@ -77,16 +77,16 @@ function local_keyuser_myprofile_navigation(\core_user\output\myprofile\tree $tr
     $systemcontext = context_system::instance();
     $courseid = !empty($course) ? $course->id : SITEID;
 
-	if(has_capability('local/keyuser:userupdate', $systemcontext)) {
-		$url = new moodle_url('/local/keyuser/user/editadvanced.php', array('id' => $user->id, 'course' => $courseid,
-			'returnto' => 'profile'));
-		$node = new core_user\output\myprofile\node('contact', 'editprofile', get_string('editmyprofile'), null, $url,
-			null, null, 'editprofile');
-		if(!isset($tree->nodes["editprofile"])){
-			$tree->add_node($node);
+    if(has_capability('local/keyuser:userupdate', $systemcontext)) {
+        $url = new moodle_url('/local/keyuser/user/editadvanced.php', array('id' => $user->id, 'course' => $courseid,
+            'returnto' => 'profile'));
+        $node = new core_user\output\myprofile\node('contact', 'editprofile', get_string('editmyprofile'), null, $url,
+            null, null, 'editprofile');
+        if(!isset($tree->nodes["editprofile"])){
+            $tree->add_node($node);
             //$tree->categories["contact"]->sort_nodes();
-		}
-	}
+        }
+    }
 }
 
 /**
