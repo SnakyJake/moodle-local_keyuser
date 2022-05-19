@@ -163,10 +163,6 @@ function keyuser_user_append_where(&$wheresql,&$params, $usertable = "{user}"){
     $wheresql .= ($wheresql ? ' AND ' : ' WHERE ') . keyuser_user_where($params,$usertable);
 }
 
-function keyuser_cohort_append_where(&$wheresql, &$params){
-    $wheresql .= ($wheresql ? ' AND ' : ' WHERE ') . keyuser_cohort_where($params);
-}
-
 
 /*
  * the following functions need to be edited for customizing the keyuser!
@@ -333,23 +329,6 @@ function keyuser_user_where(&$params,$usertable=null){
     return $sql . $wheresql . " GROUP BY userid HAVING cnt=".count($KEYUSER_CFG->linked_fields).") userdata)";
 }
 
-function keyuser_cohort_remove_rights(&$cohortname){
-    if(substr($cohortname,0,2) == "r_"){
-        $cohortname = substr($cohortname,2,strlen($cohortname));
-    }
-}
-
-function keyuser_cohort_is_readonly($cohortname){
-    $prefix_regexp = keyuser_cohort_get_prefix(true);
-
-    if($prefix_regexp){
-        if(preg_match("/".$prefix_regexp.".*/",$cohortname,$matches) === 1){
-            return count($matches) > 1;
-        }
-    }
-    return true;
-}
-
 function keyuser_cohort_get_prefix($regexp = false){
     global $KEYUSER_CFG,$USER,$SESSION;
 
@@ -380,10 +359,6 @@ function keyuser_cohort_get_prefix($regexp = false){
         }
     }
     return $prefix;
-}
-
-function keyuser_cohort_get_prefix_regexp(){
-    return keyuser_cohort_get_prefix(true);
 }
 
 function keyuser_cohort_where(&$params){
