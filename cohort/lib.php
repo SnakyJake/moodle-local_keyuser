@@ -18,7 +18,7 @@
  * Cohort related management functions, this file needs to be included manually.
  *
  * @package    local_keyuser
- * @copyright  2021 Jakob Heinemann, 2010 Petr Skoda  {@link http://skodak.org}
+ * @copyright  2022 Fabian Bech, 2021 Jakob Heinemann, 2010 Petr Skoda  {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -59,48 +59,6 @@ function keyuser_cohort_update_cohort($cohort) {
 }
 
 /**
- * Return a single keyuser_cohort as an object where the $id and keyuser conditions are met.
- *
- * @param  int $id
- * @return stdClass keyuser_cohort
- */
-function keyuser_cohort_get_record($id) {
-    global $DB;
-
-    $sql = " WHERE id = :id";
-    $params = array('prefix' => keyuser_cohort_get_prefix_regexp(), 'id' => $id);
-
-    return $DB->get_record_sql(SELECT_KEYUSER_COHORT . FROM_KEYUSER_COHORT . $sql, $params, MUST_EXIST);
-}
-
-/**
- * Get all keyuser_cohorts as an array.
- *
- * @return array of keyuser_cohorts
- */
-function keyuser_cohort_get_records() {
-    global $DB;
-
-    $params = array('prefix' => keyuser_cohort_get_prefix_regexp());
-    $order = " ORDER BY name ASC, idnumber ASC";
-
-    return $DB->get_records_sql(SELECT_KEYUSER_COHORT . FROM_KEYUSER_COHORT . $order, $params);
-}
-
-/**
- * Test whether a keyuser_cohort exists with given idnumber.
- *
- * @param  int $idnumber
- * @return bool true if a keyuser_cohort with given idnumber exists, else false
- */
-function keyuser_cohort_record_exists($idnumber) {
-    global $DB;
-
-    keyuser_cohort_add_prefix($idnumber);
-    return $DB->record_exists('cohort', array('idnumber' => $idnumber));
-}
-
-/**
  * Get all the keyuser_cohorts defined in given context.
  *
  * The function does not check user capability to view/manage cohorts in the given context
@@ -113,7 +71,7 @@ function keyuser_cohort_record_exists($idnumber) {
  * @return array    Array(totalcohorts => int, keyuser_cohorts => array, allcohorts => int)
  */
 function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $search = '') {
-    global $DB;
+    global $DB, $CFG;
 
     $fields = SELECT_KEYUSER_COHORT;
     $countfields = "SELECT COUNT(1)";
@@ -150,7 +108,7 @@ function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $searc
  * @return array    Array(totalcohorts => int, keyuser_cohorts => array, allcohorts => int)
  */
 function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') {
-    global $DB;
+    global $DB, $CFG;
 
     $fields = SELECT_KEYUSER_COHORT.", ".context_helper::get_preload_record_columns_sql('ctx');
     $countfields = "SELECT COUNT(*)";

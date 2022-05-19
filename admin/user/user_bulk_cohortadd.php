@@ -27,7 +27,9 @@ require('../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/'.$CFG->admin.'/user/user_bulk_cohortadd_form.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
+require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/local/keyuser/locallib.php');
+require_once($CFG->dirroot.'/local/keyuser/cohort/recordlib.php');
 
 $sort = optional_param('sort', 'fullname', PARAM_ALPHA);
 $dir  = optional_param('dir', 'asc', PARAM_ALPHA);

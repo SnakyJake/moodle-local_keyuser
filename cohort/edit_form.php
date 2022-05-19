@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/lib/formslib.php');
-require_once($CFG->dirroot . '/local/keyuser/locallib.php');
+require_once($CFG->dirroot . '/local/keyuser/cohort/recordlib.php');
 
 class keyuser_cohort_edit_form extends moodleform {
 
@@ -33,7 +33,6 @@ class keyuser_cohort_edit_form extends moodleform {
      * Define the cohort edit form
      */
     public function definition() {
-        //global $CFG;
 
         $mform = $this->_form;
         $editoroptions = $this->_customdata['editoroptions'];
@@ -84,7 +83,6 @@ class keyuser_cohort_edit_form extends moodleform {
     }
 
     public function validation($data, $files) {
-        //global $DB;
 
         $errors = parent::validation($data, $files);
 
