@@ -89,7 +89,7 @@ class keyuser_cohort_edit_form extends moodleform {
         $idnumber = trim($data['name']);
 
         if ($data['id']) {
-            $current = keyuser_cohort_get_record($data['id']);
+            $current = keyuser_cohort_get_record($data['id'], MUST_EXIST);
             if ($current->idnumber !== $idnumber) {
                 if (keyuser_cohort_record_exists($idnumber)) {
                     $errors['idnumber'] = get_string('duplicateidnumber', 'cohort');

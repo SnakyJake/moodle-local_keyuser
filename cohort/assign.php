@@ -31,7 +31,7 @@ $returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 
 require_login();
 
-$cohort = keyuser_cohort_get_record($id);
+$cohort = keyuser_cohort_get_record($id, MUST_EXIST);
 $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
 
 require_capability('local/keyuser:cohortassign', $context);

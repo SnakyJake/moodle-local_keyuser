@@ -42,7 +42,7 @@ $contextid = context_system::instance()->id;
 
 $category = null;
 if ($id) {
-    $cohort = keyuser_cohort_get_record($id);
+    $cohort = keyuser_cohort_get_record($id, MUST_EXIST);
     $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
 } else {
     $context = context::instance_by_id($contextid, MUST_EXIST);

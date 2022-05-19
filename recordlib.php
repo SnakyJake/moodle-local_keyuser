@@ -32,13 +32,13 @@ require_once(__DIR__ . '/cohort/lib.php');
  * @param  int $id
  * @return stdClass keyuser_cohort
  */
-function keyuser_cohort_get_record($id) {
+function keyuser_cohort_get_record($id, $strictness=IGNORE_MISSING) {
     global $DB;
 
     $sql = " WHERE id = :id";
     $params = array('prefix' => keyuser_cohort_get_prefix_regexp(), 'id' => $id);
 
-    return $DB->get_record_sql(SELECT_KEYUSER_COHORT . FROM_KEYUSER_COHORT . $sql, $params, MUST_EXIST);
+    return $DB->get_record_sql(SELECT_KEYUSER_COHORT . FROM_KEYUSER_COHORT . $sql, $params, $strictness);
 }
 
 /**
