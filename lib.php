@@ -39,9 +39,9 @@ MoodleQuickForm::registerElementType('keyusercohort', "$CFG->dirroot/local/keyus
 function local_keyuser_after_config(){
     if(array_key_exists('REQUEST_URI', $_SERVER)){
         $url = parse_url($_SERVER['REQUEST_URI']);
-        if(($url['path'] == "/user/editadvanced.php") || ($url['path'] == "/user/edit.php")) {
+        if(array_key_exists('query',$url) && (($url['path'] == "/user/editadvanced.php") || ($url['path'] == "/user/edit.php"))) {
             $systemcontext = context_system::instance();
-            if(!has_capability("moodle/user:update",$systemcontext) && (has_capability("local/keyuser:userupdate",$systemcontext) || ((strpos($url->query,"id=-1")!==false) && has_capability("local/keyuser:usercreate",$systemcontext)))){
+            if(!has_capability("moodle/user:update",$systemcontext) && (has_capability("local/keyuser:userupdate",$systemcontext) || ((strpos($url['query'],"id=-1")!==false) && has_capability("local/keyuser:usercreate",$systemcontext)))){
                 redirect("/local/keyuser/user/editadvanced.php?".$url['query']);
             }
         }
