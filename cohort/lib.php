@@ -132,7 +132,7 @@ function keyuser_cohort_update_cohort($cohort) {
 function keyuser_cohort_get_available_cohorts($currentcontext, $withmembers = 0, $offset = 0, $limit = 25, $search = '') {
     global $DB;
 
-    $params = array('prefix' => keyuser_cohort_get_prefix_regexp());
+    $params = array('prefix' => keyuser_cohort_get_prefix(true));
 
     // Build context subquery. Find the list of parent context where user is able to see any or visible-only cohorts.
     // Since this method is normally called for the current course all parent contexts are already preloaded.
@@ -215,7 +215,7 @@ function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $searc
     $countfields = "SELECT COUNT(1)";
     $sql =   FROM_KEYUSER_COHORT."
              WHERE contextid = :contextid";
-    $params = array('prefix' => keyuser_cohort_get_prefix_regexp(), 'contextid' => $contextid);
+    $params = array('prefix' => keyuser_cohort_get_prefix(true), 'contextid' => $contextid);
     $order = " ORDER BY name ASC, idnumber ASC";
 
     $totalcohorts = $allcohorts = $DB->count_records_sql($countfields . $sql, $params);
@@ -252,7 +252,7 @@ function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') 
     $countfields = "SELECT COUNT(*)";
     $sql =   FROM_KEYUSER_COHORT."
              JOIN {context} ctx ON ctx.id = c.contextid ";
-    $params = array('prefix' => keyuser_cohort_get_prefix_regexp());
+    $params = array('prefix' => keyuser_cohort_get_prefix(true));
     $wheresql = '';
 
     if ($excludedcontexts = cohort_get_invisible_contexts()) {

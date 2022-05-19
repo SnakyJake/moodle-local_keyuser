@@ -340,7 +340,7 @@ function keyuser_cohort_remove_rights(&$cohortname){
 }
 
 function keyuser_cohort_is_readonly($cohortname){
-    $prefix_regexp = keyuser_cohort_get_prefix_regexp();
+    $prefix_regexp = keyuser_cohort_get_prefix(true);
 
     if($prefix_regexp){
         if(preg_match("/".$prefix_regexp.".*/",$cohortname,$matches) === 1){
@@ -389,7 +389,7 @@ function keyuser_cohort_get_prefix_regexp(){
 function keyuser_cohort_where(&$params){
     global $KEYUSER_CFG;
 
-    $prefix_regexp = keyuser_cohort_get_prefix_regexp();
+    $prefix_regexp = keyuser_cohort_get_prefix(true);
 
     if(empty($prefix_regexp) && !$KEYUSER_CFG->no_prefix_allowed){
         return "1=2";
@@ -430,7 +430,7 @@ function keyuser_cohort_add_prefix(&$cohortname,$fixexisting=false){
 function keyuser_cohort_remove_prefix(&$cohortname){
     global $KEYUSER_CFG;
 
-    $prefix_regexp = keyuser_cohort_get_prefix_regexp();
+    $prefix_regexp = keyuser_cohort_get_prefix(true);
 
     if($prefix_regexp){
         if(preg_match("/".$prefix_regexp."(.*)/",$cohortname,$matches) === 1){

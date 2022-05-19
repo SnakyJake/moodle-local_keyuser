@@ -36,34 +36,36 @@ function keyuser_cohort_get_record($id, $strictness=IGNORE_MISSING) {
     global $DB;
 
     $sql = " WHERE id = :id";
-    $params = array('prefix' => keyuser_cohort_get_prefix_regexp(), 'id' => $id);
+    $params = array('prefix' => keyuser_cohort_get_prefix(true), 'id' => $id);
 
     return $DB->get_record_sql(SELECT_KEYUSER_COHORT . FROM_KEYUSER_COHORT . $sql, $params, $strictness);
 }
 
 /**
- * Get all keyuser_cohorts as an array.
+ * Get all keyuser_cohorts sorted by name and idnumber as an array of objects of objects.
  *
- * @return array of keyuser_cohorts
+ * @return array array of keyuser_cohorts
  */
 function keyuser_cohort_get_records() {
     global $DB;
 
-    $params = array('prefix' => keyuser_cohort_get_prefix_regexp());
+    $params = array('prefix' => keyuser_cohort_get_prefix(true));
     $order = " ORDER BY name ASC, idnumber ASC";
 
     return $DB->get_records_sql(SELECT_KEYUSER_COHORT . FROM_KEYUSER_COHORT . $order, $params);
 }
 
 /**
- * Get all keyuser_cohorts as an array.
+ * Get keyuser_cohorts as an array of objects with the given conditions.
  *
- * @return array of keyuser_cohorts
+ * @param  string $select
+ * @param  array $params
+ * @return array array of keyuser_cohorts
  */
 function keyuser_cohort_get_records_select($select, $params) {
     global $DB;
 
-    $params += array('prefix' => keyuser_cohort_get_prefix_regexp());
+    $params += array('prefix' => keyuser_cohort_get_prefix(true));
 
     return $DB->get_records_sql(SELECT_KEYUSER_COHORT . FROM_KEYUSER_COHORT . " WHERE " . $select, $params);
 }
