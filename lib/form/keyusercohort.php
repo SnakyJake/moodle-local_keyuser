@@ -133,9 +133,7 @@ class MoodleQuickForm_keyusercohort extends MoodleQuickForm_autocomplete {
 
         list($whereclause, $params) = $DB->get_in_or_equal($cohortstofetch, SQL_PARAMS_NAMED, 'id');
 
-        keyuser_cohort_append_where($whereclause,$params);
-
-        $list = $DB->get_records_select('cohort', 'id ' . $whereclause, $params, 'name');
+        $list = keyuser_cohort_get_records_select('id ' . $whereclause, $params);
 
         $currentcontext = context_helper::instance_by_id($this->contextid);
         foreach ($list as $cohort) {
@@ -143,7 +141,6 @@ class MoodleQuickForm_keyusercohort extends MoodleQuickForm_autocomplete {
             if (!cohort_can_view_cohort($cohort, $currentcontext)) {
                 continue;
             }
-            keyuser_cohort_remove_prefix($cohort->name);
             $label = format_string($cohort->name, true, $currentcontext);
             $this->addOption($label, $cohort->id);
         }

@@ -56,6 +56,19 @@ function keyuser_cohort_get_records() {
 }
 
 /**
+ * Get all keyuser_cohorts as an array.
+ *
+ * @return array of keyuser_cohorts
+ */
+function keyuser_cohort_get_records_select($select, $params) {
+    global $DB;
+
+    $params += array('prefix' => keyuser_cohort_get_prefix_regexp());
+
+    return $DB->get_records_sql(SELECT_KEYUSER_COHORT . FROM_KEYUSER_COHORT . " WHERE " . $select, $params);
+}
+
+/**
  * Test whether a keyuser_cohort exists with given idnumber.
  *
  * @param  int $idnumber
