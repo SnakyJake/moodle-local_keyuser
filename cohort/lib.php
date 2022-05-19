@@ -209,7 +209,7 @@ function keyuser_cohort_get_available_cohorts($currentcontext, $withmembers = 0,
  * @return array    Array(totalcohorts => int, keyuser_cohorts => array, allcohorts => int)
  */
 function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $search = '') {
-    global $DB, $CFG;
+    global $DB;
 
     $fields = SELECT_KEYUSER_COHORT;
     $countfields = "SELECT COUNT(1)";
@@ -246,7 +246,7 @@ function keyuser_cohort_get_cohorts($contextid, $page = 0, $perpage = 25, $searc
  * @return array    Array(totalcohorts => int, keyuser_cohorts => array, allcohorts => int)
  */
 function keyuser_cohort_get_all_cohorts($page = 0, $perpage = 25, $search = '') {
-    global $DB, $CFG;
+    global $DB;
 
     $fields = SELECT_KEYUSER_COHORT.", ".context_helper::get_preload_record_columns_sql('ctx');
     $countfields = "SELECT COUNT(*)";
