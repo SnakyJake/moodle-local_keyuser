@@ -149,7 +149,6 @@ if ($editform->is_cancelled()) {
         $editoroptions['context'] = $context = context::instance_by_id($data->contextid);
 
         if ($data->id) {
-            $data->idnumber = $data->name;
             if ($data->contextid != $oldcontextid) {
                 // Cohort was moved to another context.
                 get_file_storage()->move_area_files_to_new_context($oldcontextid, $context->id,
@@ -159,7 +158,6 @@ if ($editform->is_cancelled()) {
                     $context, 'cohort', 'description', $data->id);
             keyuser_cohort_update_cohort($data);
         } else {
-            $data->idnumber = $data->name;
             $data->descriptionformat = $data->description_editor['format'];
             $data->description = $description = $data->description_editor['text'];
             $data->id = keyuser_cohort_add_cohort($data);
