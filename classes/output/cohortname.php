@@ -60,7 +60,6 @@ class cohortname extends \core\output\inplace_editable {
      * @return static
      */
     public static function update($cohortid, $newvalue) {
-        global $DB;
         $cohort = keyuser_cohort_get_record($cohortid, MUST_EXIST);
         $cohortcontext = \context::instance_by_id($cohort->contextid);
         \external_api::validate_context($cohortcontext);
