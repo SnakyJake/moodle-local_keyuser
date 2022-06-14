@@ -45,15 +45,10 @@ class keyuser_cohort_edit_form extends moodleform {
         /*
         $options = $this->get_category_options($cohort->contextid);
         $mform->addElement('autocomplete', 'contextid', get_string('context', 'role'), $options);
-        */
-        $mform->addElement('hidden','contextid');
-        $mform->setType('contextid', PARAM_TEXT);
-        /*
+
         $mform->addElement('text', 'idnumber', get_string('idnumber', 'cohort'), 'maxlength="254" size="50"');
         $mform->setType('idnumber', PARAM_RAW); // Idnumbers are plain text, must not be changed.
         */
-        $mform->addElement('hidden','idnumber');
-        $mform->setType('idnumber', PARAM_TEXT);
 
         $mform->addElement('advcheckbox', 'visible', get_string('visible', 'cohort'));
         $mform->setDefault('visible', 1);
@@ -87,18 +82,20 @@ class keyuser_cohort_edit_form extends moodleform {
         $errors = parent::validation($data, $files);
 
         $idnumber = trim($data['name']);
+        if ($idnumber === '') {
+            $errors['name'] = get_string('namefieldempty', 'cohort');
 
-        if ($data['id']) {
+        } else if ($data['id']) {
             $current = keyuser_cohort_get_record($data['id'], MUST_EXIST);
             if ($current->idnumber !== $idnumber) {
                 if (keyuser_cohort_record_exists($idnumber)) {
-                    $errors['idnumber'] = get_string('duplicateidnumber', 'cohort');
+                    $errors['name'] = get_string('duplicateidnumber', 'cohort');
                 }
             }
 
         } else {
             if (keyuser_cohort_record_exists($idnumber)) {
-                $errors['idnumber'] = get_string('duplicateidnumber', 'cohort');
+                $errors['name'] = get_string('duplicateidnumber', 'cohort');
             }
         }
 
