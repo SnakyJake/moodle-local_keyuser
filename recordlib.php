@@ -30,7 +30,7 @@ require_once(__DIR__ . '/cohort/lib.php');
  * Return a single keyuser_cohort as an object where the $id and keyuser conditions are met.
  *
  * @param  int $id
- * @return stdClass keyuser_cohort
+ * @return mixed keyuser_cohort
  */
 function keyuser_cohort_get_record($id, $strictness=IGNORE_MISSING) {
     global $DB;
@@ -73,7 +73,7 @@ function keyuser_cohort_get_records_select($select, $params) {
 /**
  * Test whether a keyuser_cohort exists with given idnumber.
  *
- * @param  int $idnumber
+ * @param  string $idnumber
  * @return bool true if a keyuser_cohort with given idnumber exists, else false
  */
 function keyuser_cohort_record_exists($idnumber) {
