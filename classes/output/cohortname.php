@@ -24,7 +24,7 @@
 
 namespace local_keyuser\output;
 
-require_once($CFG->dirroot.'/local/keyuser/cohort/lib.php');
+require_once($CFG->dirroot.'/local/keyuser/recordlib.php');
 
 use lang_string;
 
@@ -61,12 +61,12 @@ class cohortname extends \core\output\inplace_editable {
      */
     public static function update($cohortid, $newvalue) {
         global $DB;
-        $cohort = $DB->get_record('cohort', array('id' => $cohortid), '*', MUST_EXIST);
+        $cohort = keyuser_cohort_get_record($cohortid, MUST_EXIST);
         $cohortcontext = \context::instance_by_id($cohort->contextid);
         \external_api::validate_context($cohortcontext);
         \require_capability('local/keyuser:cohortmanage', $cohortcontext);
         $newvalue = clean_param($newvalue, PARAM_TEXT);
-        if (strval($newvalue) !== '') {
+        if (strval($newvalue) !== '' && !keyuser_cohort_record_exists($newvalue)) {
             $record = (object)array('id' => $cohort->id, 'name' => $newvalue, 'contextid' => $cohort->contextid);
             keyuser_cohort_update_cohort($record);
             $cohort->name = $newvalue;
@@ -75,7 +75,7 @@ class cohortname extends \core\output\inplace_editable {
         return new static($cohort);
     }
 
-/**
+    /**
      * Export this data so it can be used as the context for a mustache template (core/inplace_editable).
      *
      * @param renderer_base $output typically, the renderer that's calling this function
