@@ -406,12 +406,15 @@ function keyuser_cohort_remove_prefix(&$cohortname){
     global $KEYUSER_CFG;
 
     $prefix_regexp = keyuser_cohort_get_prefix(true);
-
     if($prefix_regexp){
+        /*
         if(preg_match("/".$prefix_regexp."(.*)/",$cohortname,$matches) === 1){
             $cohortname = end($matches);
             return true;
         }
+        */
+        $cohortname = preg_replace('#'.preg_quote($prefix_regexp).'#Ai', '', $cohortname, 1);
+        return true;
     }
     return $KEYUSER_CFG->no_prefix_allowed?true:false;
 }
