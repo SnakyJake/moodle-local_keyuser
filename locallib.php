@@ -206,7 +206,7 @@ class keyuser_config {
         }
 
         //actually we think, any keyuser should have the permission to update users
-        array_filter(get_roles_with_capability("local/keyuser:userupdate", CAP_ALLOW, context_system::instance()), 
+        array_filter(get_roles_with_capability("local/keyuser:userupdate", CAP_ALLOW, context_system::instance()),
             function($var){
                 $this->roles_enabled[$var->id] = $var->id;
             });
@@ -251,7 +251,7 @@ class keyuser_config {
                 $this->linked_fields[$field_id] = $DB->get_record('user_info_field', ['id' => $field_id], '*');
             }
         }
-        if(empty($this->cohort_prefix_field_ids)){ 
+        if(empty($this->cohort_prefix_field_ids)){
             $this->cohort_prefix_field_ids = $this->cohort_prefix_default;
             foreach($this->cohort_prefix_field_ids as $field_id){
                 $this->cohort_prefix_fields[$field_id] = $DB->get_record('user_info_field', ['id' => $field_id], '*');
@@ -329,12 +329,18 @@ function keyuser_user_where(&$params,$usertable=null){
     return $sql . $wheresql . " GROUP BY userid HAVING cnt=".count($KEYUSER_CFG->linked_fields).") userdata)";
 }
 
+/**
+ * Return prefix of current $USER.
+ *
+ * @param  bool $regexp
+ * @return string|bool prefix of $USER
+ */
 function keyuser_cohort_get_prefix($regexp = false){
     global $KEYUSER_CFG,$USER,$SESSION;
 
     $prefix = $regexp?'^':'';
     $divider = $regexp?"_(r_)?":"_";
-    
+
     foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
         if(empty($USER->profile[$field->shortname])){
             //disable "no_prefix_allowed" if prefix fields are chosen!
@@ -361,58 +367,36 @@ function keyuser_cohort_get_prefix($regexp = false){
     return $prefix;
 }
 
-function keyuser_cohort_where(&$params){
-    global $KEYUSER_CFG;
-
-    $prefix_regexp = keyuser_cohort_get_prefix(true);
-
-    if(empty($prefix_regexp) && !$KEYUSER_CFG->no_prefix_allowed){
-        return "1=2";
-    }
-    $params['prefix'] = $prefix_regexp;
-    return "idnumber REGEXP(:prefix)";
-}
-
-function keyuser_cohort_add_prefix(&$cohortname,$fixexisting=false){
+/**
+ * Prepend prefix to $cohortname
+ *
+ * @param  string $cohortname
+ * @return bool
+ */
+function keyuser_cohort_add_prefix(&$cohortname){
     global $KEYUSER_CFG,$DB;
 
     $prefix = keyuser_cohort_get_prefix();
     if($prefix){
-        if($fixexisting){
-            $cohortname_without_prefix = $cohortname;
-            keyuser_cohort_remove_prefix($cohortname_without_prefix);
-            $sql = "SELECT id FROM {cohort} ";
-            $wheresql = "WHERE ".keyuser_cohort_where($params);
-            $params['prefix'] .= $cohortname_without_prefix."$";
-            if($DB->record_exists_sql($sql . $wheresql,$params))
-            {
-                $cohortname = $prefix . $cohortname_without_prefix;
-
-            } else {
-                if($DB->record_exists_sql($sql . $wheresql,["cname"=>$prefix."r_".$tmp."%"]))
-                {
-                    $cohortname = $prefix . "r_" . $tmp;
-                }
-            }
-        } else if(substr($cohortname, 0, strlen($prefix)) != $prefix){
+        if(substr($cohortname, 0, strlen($prefix)) != $prefix){
             $cohortname = $prefix . $cohortname;
         }
         return true;
     }
     return $KEYUSER_CFG->no_prefix_allowed?true:false;
-}                                                                                                                                                                              
+}
 
+/**
+ * Remove prefix of $cohortname
+ *
+ * @param  string $cohortname
+ * @return bool
+ */
 function keyuser_cohort_remove_prefix(&$cohortname){
     global $KEYUSER_CFG;
 
     $prefix_regexp = keyuser_cohort_get_prefix(true);
     if($prefix_regexp){
-        /*
-        if(preg_match("/".$prefix_regexp."(.*)/",$cohortname,$matches) === 1){
-            $cohortname = end($matches);
-            return true;
-        }
-        */
         $cohortname = preg_replace('#'.preg_quote($prefix_regexp).'#Ai', '', $cohortname, 1);
         return true;
     }
@@ -471,7 +455,7 @@ function keyuser_cohort_prefix_select($url='index.php'){
                     'selected' => $value == $keyuser_prefix,
                 ];
             }
-            
+
             $result .= $OUTPUT->render_from_template('core/single_select', $data);
         }
     }
@@ -508,7 +492,7 @@ function keyuser_linkedfield_select($url='user.php'){
                     'selected' => $value == $keyuser_linkedfield,
                 ];
             }
-            
+
             $result .= $OUTPUT->render_from_template('core/single_select', $data);
         }
     }
