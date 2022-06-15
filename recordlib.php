@@ -42,6 +42,21 @@ function keyuser_cohort_get_record($id, $strictness=IGNORE_MISSING) {
 }
 
 /**
+ * Return a single keyuser_cohort as an object where the $idnumber and keyuser conditions are met.
+ *
+ * @param  string $idnumber
+ * @return mixed keyuser_cohort
+ */
+function keyuser_cohort_get_record_by_idnumber($idnumber) {
+    global $DB;
+
+    $sql = " HAVING idnumber = :idnumber";
+    $params = array('prefix' => keyuser_cohort_get_prefix(true), 'idnumber' => $idnumber);
+
+    return $DB->get_record_sql(SELECT_KEYUSER_COHORT . FROM_KEYUSER_COHORT . $sql, $params);
+}
+
+/**
  * Get all keyuser_cohorts sorted by name and idnumber as an array of objects of objects.
  *
  * @return array array of keyuser_cohorts

@@ -18,7 +18,7 @@
  * Class process
  *
  * @package     local_keyuser, tool_uploaduser
- * @copyright   2020 Moodle, 2021 Jakob Heinemann
+ * @copyright   2020 Moodle, 2021 Jakob Heinemann, 2022 Fabian Bech
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,6 +26,15 @@ namespace keyuser_tool_uploaduser;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot.'/local/keyuser/recordlib.php');
+
+/**
+ * Process CSV file with users data, this will create/update users, enrol them into courses, add them to keyuser_cohorts etc
+ *
+ * @package     local_keyuser, tool_uploaduser
+ * @copyright   2020 Moodle, 2021 Jakob Heinemann, 2022 Fabian Bech
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class process extends \tool_uploaduser\process {
 
     /**
@@ -633,17 +642,17 @@ class process extends \tool_uploaduser\process {
                 if (!isset($this->cohorts[$addcohort])) {
                     if (is_number($addcohort)) {
                         // Only non-numeric idnumbers!
-                        $cohort = $DB->get_record('cohort', ['id' => $addcohort]);
+                        $cohort = keyuser_cohort_get_record($addcohort);
                     } else {
-                        $cohort = $DB->get_record('cohort', ['idnumber' => $addcohort]);
+                        $cohort = keyuser_cohort_get_record_by_idnumber($addcohort);
                         if (empty($cohort) && has_capability('moodle/cohort:manage', \context_system::instance())) {
                             // Cohort was not found. Create a new one.
-                            $cohortid = cohort_add_cohort((object)array(
+                            $cohortid = keyuser_cohort_add_cohort((object)array(
                                 'idnumber' => $addcohort,
                                 'name' => $addcohort,
                                 'contextid' => \context_system::instance()->id
                             ));
-                            $cohort = $DB->get_record('cohort', ['id' => $cohortid]);
+                            $cohort = keyuser_cohort_get_record($cohortid);
                         }
                     }
 
