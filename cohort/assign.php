@@ -23,7 +23,7 @@
  */
 
 require('../../../config.php');
-require_once($CFG->dirroot.'/local/keyuser/locallib.php');
+require_once($CFG->dirroot.'/local/keyuser/cohort/locallib.php');
 require_once($CFG->dirroot.'/local/keyuser/recordlib.php');
 
 $id = required_param('id', PARAM_INT);
