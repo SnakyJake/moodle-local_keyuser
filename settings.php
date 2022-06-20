@@ -48,7 +48,7 @@ if ($hassiteconfig){
     $settings->add(new admin_setting_heading('local_keyuser/settings',get_string('settings'),''));
 
     //enable empty cohort prefix
-    $settings->add(new admin_setting_configcheckbox('local_keyuser/no_prefix_allowed',get_string('settings_keyuser_no_prefix_allowed','local_keyuser'),'',0));
+    $settings->add(new admin_setting_configcheckbox('local_keyuser/no_prefix_allowed',get_string('settings_keyuser_no_prefix_allowed','local_keyuser'),get_string('settings_keyuser_no_prefix_allowed_desc','local_keyuser'),0));
 
     $options = $DB->get_records_menu('user_info_field',null,'',"id, CONCAT(shortname,' (',name,')')");
 

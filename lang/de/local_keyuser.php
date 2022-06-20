@@ -55,14 +55,15 @@ $string['link_checkmoodlechanges'] = "Moodle-Dateien auf Änderungen überprüfe
 $string['heading_changedfilescount'] = '{$a} Dateien haben sich geändert:';
 $string['heading_unchangedfilescount'] = '{$a} Dateien sind gleich geblieben:';
 
-$string['settings_keyuser_no_prefix_allowed'] = "Erlaube Globale Gruppen ohne verlinkten Prefix";
+$string['settings_keyuser_no_prefix_allowed'] = "Erlaube Globale Gruppen ohne verlinkten Präfix";
+$string['settings_keyuser_no_prefix_allowed_desc'] = "Wenn kein Präfix für Globale Gruppen definiert ist, sehen Keyuser ALLE Globalen Gruppen, wenn diese Einstellung gesetzt ist!";
 $string['settings_keyuser_linkedfields'] = "Verknüpfte Profilfelder";
 $string['settings_keyuser_linkedfieldshelp'] = "Die Profilfelder, die der Keyuserin/dem Keyuser die Userinnen bzw. Usern zuweisen.";
 $string['settings_keyuser_linkedfieldsmulti'] = "Profilfelder mit Mehrfachwerten";
 $string['settings_keyuser_linkedfieldsmultihelp'] = "Bei Auswahl werden alle Werte akzeptiert!";
-$string['settings_keyuser_cohortprefixfields'] = "Prefix-Profilfelder";
-$string['settings_keyuser_cohortprefixfieldshelp'] = "Prefix-Profilfelder für die automatische Benennung Globaler Gruppen.";
-$string['settings_keyuser_cohortprefixfieldsmulti'] = "Prefix-Profilfelder Mehrfachwerte";
+$string['settings_keyuser_cohortprefixfields'] = "Präfix-Profilfelder";
+$string['settings_keyuser_cohortprefixfieldshelp'] = "Präfix-Profilfelder für die automatische Benennung Globaler Gruppen.";
+$string['settings_keyuser_cohortprefixfieldsmulti'] = "Präfix-Profilfelder Mehrfachwerte";
 $string['settings_keyuser_cohortprefixfieldsmultihelp'] = "Zeige alle Globalen Gruppen mit nur einem dieser Werte";
 
 $string['label_cohort_prefix_select'] = "Gruppen-Präfix: ";

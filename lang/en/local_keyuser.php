@@ -56,6 +56,7 @@ $string['heading_changedfilescount'] = '{$a} files have changed:';
 $string['heading_unchangedfilescount'] = '{$a} files are the same:';
 
 $string['settings_keyuser_no_prefix_allowed'] = "Allow no linked cohort prefix field";
+$string['settings_keyuser_no_prefix_allowed_desc'] = "If no cohort prefix is defined, keyusers will see ALL cohorts id this is enabled!";
 $string['settings_keyuser_linkedfields'] = "Linked profile fields";
 $string['settings_keyuser_linkedfieldshelp'] = "Which custom profile fields are linked between keyuser and the users he manages.";
 $string['settings_keyuser_linkedfieldsmulti'] = "Linked profile fields multiple values";
