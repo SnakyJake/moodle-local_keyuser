@@ -645,7 +645,7 @@ class process extends \tool_uploaduser\process {
                         $cohort = keyuser_cohort_get_record($addcohort);
                     } else {
                         $cohort = keyuser_cohort_get_record_by_idnumber($addcohort);
-                        if (empty($cohort) && has_capability('moodle/cohort:manage', \context_system::instance())) {
+                        if (empty($cohort) && (has_capability('moodle/cohort:manage', \context_system::instance()) || has_capability('local/keyuser:cohortmanage', \context_system::instance())) {
                             // Cohort was not found. Create a new one.
                             $cohortid = keyuser_cohort_add_cohort((object)array(
                                 'idnumber' => $addcohort,
