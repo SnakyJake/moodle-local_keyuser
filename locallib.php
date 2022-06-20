@@ -24,12 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
-function keyuser_user_append_where(&$wheresql,&$params, $usertable = "{user}"){
-    $wheresql .= ($wheresql ? ' AND ' : ' WHERE ') . keyuser_user_where($params,$usertable);
-}
-
-
 /*
  * the following functions need to be edited for customizing the keyuser!
  * (in special cases! Actually no need for it anymore, I try to implement everything for this in the settings.)
@@ -150,6 +144,10 @@ function get_keyusers($ignore_self = false){
 
     $keyusers = $DB->get_records_sql($sql, $params);
     return $keyusers;
+}
+
+function keyuser_user_append_where(&$wheresql,&$params, $usertable = "{user}"){
+    $wheresql .= ($wheresql ? ' AND ' : ' WHERE ') . keyuser_user_where($params,$usertable);
 }
 
 function keyuser_user_where(&$params,$usertable=null){
