@@ -80,7 +80,7 @@ if (empty($iid)) {
 }
 
 // Test if columns ok.
-$process = new \local_keyuser\tool\uploaduser\process($cir);
+$process = new \local_keyuser\tool_uploaduser\process($cir);
 $filecolumns = $process->get_file_columns();
 
 $mform2 = new keyuser_admin_uploaduser_form2(null,

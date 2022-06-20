@@ -58,7 +58,7 @@ function local_keyuser_after_config(){
  */
 function local_keyuser_inplace_editable($itemtype, $itemid, $newvalue) {
     if ($itemtype === 'cohortname') {
-        return \local_keyuser\output\cohortname::update($itemid, $newvalue);
+        return \local_keyuser\core_cohort\output\cohortname::update($itemid, $newvalue);
     }
 }
 

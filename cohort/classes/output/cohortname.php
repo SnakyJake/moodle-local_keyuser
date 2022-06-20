@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_keyuser\cohort\output;
+namespace local_keyuser\core_cohort\output;
 
 require_once($CFG->dirroot.'/local/keyuser/recordlib.php');
 

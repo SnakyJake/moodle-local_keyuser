@@ -39,7 +39,7 @@ define('FROM_KEYUSER_COHORT',	 " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix
  * @return int new cohort id
  */
 function keyuser_cohort_add_cohort($cohort) {
-    global $DB, $CFG;
+    global $DB, $CFG, $KEYUSER_CFG;
 
     if (!isset($cohort->name)) {
         throw new coding_exception('Missing cohort name in cohort_add_cohort().');
