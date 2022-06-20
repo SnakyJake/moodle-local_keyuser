@@ -95,6 +95,6 @@ function keyuser_cohort_get_records_select($select, $params) {
 function keyuser_cohort_record_exists($idnumber) {
     global $DB;
 
-    $idnumber = keyuser_cohort_get_prefix(true) . $idnumber;
+    $idnumber = '^' . keyuser_cohort_get_prefix(true) . preg_quote($idnumber) . '$';
     return $DB->record_exists_select('cohort', 'idnumber REGEXP ?', [$idnumber]);
 }
