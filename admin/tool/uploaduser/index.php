@@ -24,13 +24,11 @@
  */
 
 require('../../../../../config.php');
-require_once($CFG->libdir.'/adminlib.php');
-require_once($CFG->libdir.'/csvlib.class.php');
 require_once($CFG->dirroot.'/local/keyuser/locallib.php');
+require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/local/keyuser/lib/csvlib.class.php');
 require_once($CFG->dirroot.'/'.$CFG->admin.'/tool/uploaduser/locallib.php');
 require_once($CFG->dirroot.'/local/keyuser/admin/tool/uploaduser/user_form.php');
-require_once($CFG->dirroot.'/local/keyuser/admin/tool/uploaduser/classes/process.php');
 
 $iid         = optional_param('iid', '', PARAM_INT);
 $previewrows = optional_param('previewrows', 10, PARAM_INT);
@@ -82,7 +80,7 @@ if (empty($iid)) {
 }
 
 // Test if columns ok.
-$process = new \keyuser_tool_uploaduser\process($cir);
+$process = new \local_keyuser\tool\uploaduser\process($cir);
 $filecolumns = $process->get_file_columns();
 
 $mform2 = new keyuser_admin_uploaduser_form2(null,

@@ -28,6 +28,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir.'/csvlib.class.php');
+
 /**
  * Utitily class for importing of CSV files.
  * @copyright Jakob Heinemann, Petr Skoda

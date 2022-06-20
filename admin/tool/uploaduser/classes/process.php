@@ -17,12 +17,12 @@
 /**
  * Class process
  *
- * @package     local_keyuser, tool_uploaduser
+ * @package     local_keyuser, keyusertool_uploaduser
  * @copyright   2020 Moodle, 2021 Jakob Heinemann, 2022 Fabian Bech
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace keyuser_tool_uploaduser;
+namespace local_keyuser\tool\uploaduser;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -645,7 +645,7 @@ class process extends \tool_uploaduser\process {
                         $cohort = keyuser_cohort_get_record($addcohort);
                     } else {
                         $cohort = keyuser_cohort_get_record_by_idnumber($addcohort);
-                        if (empty($cohort) && (has_capability('moodle/cohort:manage', \context_system::instance()) || has_capability('local/keyuser:cohortmanage', \context_system::instance())) {
+                        if (empty($cohort) && (has_capability('moodle/cohort:manage', \context_system::instance()) || has_capability('local/keyuser:cohortmanage', \context_system::instance()))) {
                             // Cohort was not found. Create a new one.
                             $cohortid = keyuser_cohort_add_cohort((object)array(
                                 'idnumber' => $addcohort,
