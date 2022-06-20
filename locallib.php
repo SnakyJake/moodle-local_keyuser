@@ -374,8 +374,6 @@ function keyuser_cohort_get_prefix($regexp = false){
  * @return bool
  */
 function keyuser_cohort_add_prefix(&$cohortname){
-    global $KEYUSER_CFG,$DB;
-
     $prefix = keyuser_cohort_get_prefix();
     if($prefix){
         if(substr($cohortname, 0, strlen($prefix)) != $prefix){
@@ -383,24 +381,20 @@ function keyuser_cohort_add_prefix(&$cohortname){
         }
         return true;
     }
-    return $KEYUSER_CFG->no_prefix_allowed?true:false;
+    return false;
 }
 
 /**
  * Remove prefix of $cohortname
  *
  * @param  string $cohortname
- * @return bool
+ * @return void
  */
 function keyuser_cohort_remove_prefix(&$cohortname){
-    global $KEYUSER_CFG;
-
     $prefix_regexp = keyuser_cohort_get_prefix(true);
     if($prefix_regexp){
         $cohortname = preg_replace('!'.preg_quote($prefix_regexp).'!Ai', '', $cohortname, 1);
-        return true;
     }
-    return $KEYUSER_CFG->no_prefix_allowed?true:false;
 }
 
 function keyuser_cohort_prefix_options_for_select(){

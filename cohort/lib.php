@@ -72,7 +72,7 @@ function keyuser_cohort_add_cohort($cohort) {
         $cohort->timemodified = $cohort->timecreated;
     }
 
-    if (!keyuser_cohort_add_prefix($cohort->name))
+    if (!keyuser_cohort_add_prefix($cohort->name) && $KEYUSER_CFG->no_prefix_allowed)
         return 0;
     $cohort->idnumber = $cohort->name;
     $cohort->id = $DB->insert_record('cohort', $cohort);
@@ -93,7 +93,7 @@ function keyuser_cohort_add_cohort($cohort) {
  * @return void
  */
 function keyuser_cohort_update_cohort($cohort) {
-    global $DB, $CFG;
+    global $DB, $CFG, $KEYUSER_CFG;
     if (property_exists($cohort, 'component') and empty($cohort->component)) {
         // prevent NULLs
         $cohort->component = '';
@@ -103,7 +103,7 @@ function keyuser_cohort_update_cohort($cohort) {
         unset($cohort->theme);
     }
     $cohort->timemodified = time();
-    if (!keyuser_cohort_add_prefix($cohort->name))
+    if (!keyuser_cohort_add_prefix($cohort->name) && $KEYUSER_CFG->no_prefix_allowed)
         return;
     $cohort->idnumber = $cohort->name;
     $DB->update_record('cohort', $cohort);
