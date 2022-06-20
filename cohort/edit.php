@@ -26,6 +26,7 @@ require('../../../config.php');
 require_once($CFG->dirroot.'/course/lib.php');
 require_once($CFG->dirroot.'/local/keyuser/cohort/lib.php');
 require_once($CFG->dirroot.'/local/keyuser/cohort/edit_form.php');
+require_once($CFG->dirroot.'/local/keyuser/outputlib.php');
 
 $id        = optional_param('id', 0, PARAM_INT);
 $contextid = optional_param('contextid', 0, PARAM_INT);

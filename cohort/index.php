@@ -23,9 +23,9 @@
  */
 
 require('../../../config.php');
-require_once($CFG->dirroot.'/local/keyuser/locallib.php');
 require_once($CFG->dirroot.'/local/keyuser/cohort/lib.php');
 require_once($CFG->libdir.'/adminlib.php');
+require_once($CFG->dirroot.'/local/keyuser/outputlib.php');
 
 $contextid = optional_param('contextid', 0, PARAM_INT);
 $page = optional_param('page', 0, PARAM_INT);

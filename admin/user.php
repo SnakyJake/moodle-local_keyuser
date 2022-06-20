@@ -1,11 +1,11 @@
 <?php
 
-    require(__DIR__ . '/../../../config.php');
+    require(__DIR__.'/../../../config.php');
     require_once($CFG->libdir.'/adminlib.php');
     require_once($CFG->libdir.'/authlib.php');
     require_once('../user/filters/lib.php');
     require_once($CFG->dirroot.'/user/lib.php');
-    require_once($CFG->dirroot.'/local/keyuser/locallib.php');
+    require_once($CFG->dirroot.'/local/keyuser/outputlib.php');
 
     $delete       = optional_param('delete', 0, PARAM_INT);
     $confirm      = optional_param('confirm', '', PARAM_ALPHANUM);   //md5 confirmation hash
@@ -52,7 +52,7 @@
         $params = ['id'=> $confirmuser, 'mnethostid'=>$CFG->mnet_localhost_id];
         keyuser_user_append_where($wheresql,$params);
         $user = $DB->get_record_sql($sql, $params, IGNORE_MISSING);
-    
+
         if (!$user) {
             print_error('nousers');
         }
@@ -74,7 +74,7 @@
         $params = ['id'=>$resendemail, 'mnethostid'=>$CFG->mnet_localhost_id];
         keyuser_user_append_where($wheresql,$params);
         $user = $DB->get_record_sql($sql . $wheresql, $params, IGNORE_MISSING);
-    
+
         if (!$user) {
             print_error('nousers');
         }
@@ -233,7 +233,7 @@
     // Get all user name fields as an array, but with firstname and lastname first.
     $allusernamefields = \core_user\fields::get_name_fields(true);
     $columns = array_merge($allusernamefields, $extracolumns, $requiredcolumns);
-    
+
     foreach ($columns as $column) {
         $string[$column] = \core_user\fields::get_display_name($column);
         if ($sort != $column) {
