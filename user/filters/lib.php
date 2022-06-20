@@ -27,7 +27,7 @@ require_once($CFG->dirroot.'/user/filters/lib.php');
 
 class keyuser_user_filtering extends user_filtering {
     public function __construct($fieldnames = null, $baseurl = null, $extraparams = null) {
-        GLOBAL $DB,$USER,$SESSION;
+        global $SESSION, $DB, $USER;
 
         if (!isset($SESSION->user_filtering)) {
             $SESSION->user_filtering = array();
@@ -109,7 +109,7 @@ class keyuser_user_filtering extends user_filtering {
             $this->_activeform = new user_active_filter_form($baseurl, array('fields' => $this->_fields, 'extraparams' => $extraparams));
         }
     }
-    
+
     public function get_sql_filter($extra='', array $params=null) {
         $sql = parent::get_sql_filter($extra, $params);
         $sql[0] .= $sql[0]?" AND ":"";
