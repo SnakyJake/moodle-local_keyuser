@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('SELECT_KEYUSER_COHORT', "SELECT c.id, c.contextid, SUBSTRING(c.idnumber, LENGTH(c.prefix)+1) as name, SUBSTRING(c.idnumber, LENGTH(c.prefix)+1) as idnumber, c.description, c.descriptionformat, c.visible, c.component, c.timecreated, c.timemodified, c.theme, c.name as realname, c.idnumber as realidnumber, INSTR(c.prefix, '_r_') > 0 as readonly");
+define('SELECT_KEYUSER_COHORT', "SELECT c.id, c.contextid, SUBSTRING(c.idnumber, CHAR_LENGTH(c.prefix)+1) as name, SUBSTRING(c.idnumber, CHAR_LENGTH(c.prefix)+1) as idnumber, c.description, c.descriptionformat, c.visible, c.component, c.timecreated, c.timemodified, c.theme, c.name as realname, c.idnumber as realidnumber, INSTR(c.prefix, '_r_') > 0 as readonly");
 define('FROM_KEYUSER_COHORT',	 " FROM (SELECT *, REGEXP_SUBSTR(idnumber, :prefix) as prefix
                                            FROM {cohort}
                                          HAVING prefix IS NOT NULL) c");
