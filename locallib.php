@@ -197,50 +197,62 @@ function keyuser_user_where(&$params,$usertable=null){
  * Return prefix of current $USER.
  *
  * @param  bool $regexp
- * @return string|bool prefix of $USER
+ * @return string prefix of $USER
  */
 function keyuser_cohort_get_prefix($regexp = false){
     global $KEYUSER_CFG,$USER,$SESSION;
 
     $prefix = $regexp?'^':'';
-    $divider = $regexp?"_(r_)?":"_";
+    $divider = $regexp?'_(r_)?':'_';
 
-    foreach($KEYUSER_CFG->cohort_prefix_fields as $field){
-        if(empty($USER->profile[$field->shortname])){
+    foreach ($KEYUSER_CFG->cohort_prefix_fields as $field) {
+        $fieldvalue = $USER->profile[$field->shortname];
+
+        if (empty($fieldvalue)) {
             //disable "no_prefix_allowed" if prefix fields are chosen!
             $KEYUSER_CFG->no_prefix_allowed = false;
-            return false;
+            return '';  // also a false boolean
         }
-        $fieldvalue = $USER->profile[$field->shortname];
-        if(keyuser_is_multivalue($field,$fieldvalue,$KEYUSER_CFG->cohort_prefix_fieldsmulti)){
+
+        if (keyuser_is_multivalue($field, $fieldvalue, $KEYUSER_CFG->cohort_prefix_fieldsmulti)) {
             $inputname = 'keyuser_prefix_'.$field->id;
             $keyuser_prefix = optional_param($inputname, "", PARAM_TEXT);
-            if(empty($keyuser_prefix) && array_key_exists($inputname,$SESSION)){
+            if (empty($keyuser_prefix) && array_key_exists($inputname, $SESSION)) {
                 $keyuser_prefix = $SESSION->$inputname;
             } else {
                 $SESSION->$inputname = $keyuser_prefix;
             }
-            if(empty($keyuser_prefix)){
+            if (empty($keyuser_prefix)) {
                 $keyuser_prefix = $fieldvalue[0];
             }
-            $prefix .= $keyuser_prefix.$divider;
+            $prefix .= $regexp?preg_quote($keyuser_prefix):$keyuser_prefix;
         } else {
-            $prefix .= (is_array($fieldvalue)?implode($divider,$fieldvalue):$fieldvalue).$divider;
+            //$prefix .= (is_array($fieldvalue)?implode($divider,$fieldvalue):$fieldvalue);
+            if (is_array($fieldvalue)) {
+                if ($regexp) {
+                    $fieldvalue = '(' . implode('|', array_map('preg_quote', $fieldvalue)) . ')';
+                } else {
+                    return '';  // also a false boolean
+                }
+            }
+            $prefix .= $fieldvalue;
         }
+
+        $prefix .= $divider;
     }
     return $prefix;
 }
 
 /**
  * Prepend prefix to $cohortname
+ * Prefix always without _r_
  *
  * @param  string $cohortname
- * @return bool
+ * @return bool If prefix added
  */
-function keyuser_cohort_add_prefix(&$cohortname){
-    $prefix = keyuser_cohort_get_prefix();
-    if($prefix){
-        if(substr($cohortname, 0, strlen($prefix)) != $prefix){
+function keyuser_cohort_add_prefix(&$cohortname) {
+    if ($prefix = keyuser_cohort_get_prefix()) {
+        if (substr($cohortname, 0, strlen($prefix)) != $prefix) {
             $cohortname = $prefix . $cohortname;
         }
         return true;
@@ -250,32 +262,50 @@ function keyuser_cohort_add_prefix(&$cohortname){
 
 /**
  * Remove prefix of $cohortname
+ * Prefix may contain _r_
  *
  * @param  string $cohortname
- * @return void
+ * @return bool If prefix removed
  */
-function keyuser_cohort_remove_prefix(&$cohortname){
-    $prefix_regexp = keyuser_cohort_get_prefix(true);
-    if($prefix_regexp){
-        $cohortname = preg_replace('!'.preg_quote($prefix_regexp).'!Ai', '', $cohortname, 1);
+function keyuser_cohort_remove_prefix(&$cohortname) {
+    if ($prefix = keyuser_cohort_get_prefix(true)) {
+        $cohortname = preg_replace('!' . $prefix . '!Ai', '', $cohortname, 1, $count);
+        return $count;
+    }
+    return false;
+}
+
+/**
+ * Remove prefix of $cohortname if $key is "^cohort\d+$"
+ * Prefix may contain _r_
+ *
+ * @param string $cohortname
+ * @param string $key
+ */
+function keyuser_cohort_remove_prefix_by_cohort_key(&$cohortname, $key) {
+    if (preg_match('/^cohort\d+$/', $key) && !empty($cohortname)) {
+        keyuser_cohort_remove_prefix($cohortname);
     }
 }
 
 /**
- * Summary of keyuser_is_multivalue
+ * Decode $field value of user profile
  *
- * @return array|string
+ * @param mixed $field Profile field to be decoded
+ * @param string|array $value Value of given $field
+ * @param array $multiconfig All multivalue fields
+ * @return bool
  */
-function keyuser_is_multivalue($field,&$value,$multiconfig){
+function keyuser_is_multivalue($field, &$value, $multiconfig) {
     global $USER;
 
     $tmp = json_decode($USER->profile[$field->shortname]);
     $err = json_last_error();
-    if($err === JSON_ERROR_NONE){
+    if ($err === JSON_ERROR_NONE) {
         $value = $tmp;
     } elseif ($err === JSON_ERROR_SYNTAX) {
         $value = $USER->profile[$field->shortname];
     }
-    return is_array($value) && in_array($field->id,$multiconfig);
+    return is_array($value) && in_array($field->id, $multiconfig);
 }
 

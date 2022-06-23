@@ -41,18 +41,12 @@ admin_externalpage_setup('keyuser_uploadusers');
 $returnurl = new moodle_url('/local/keyuser/admin/tool/uploaduser/index.php');
 $bulknurl  = new moodle_url('/local/keyuser/admin/user/user_bulk.php');
 
-$cols_to_remove = ["autosubscribe","maildisplay","country","lang","timezone"];
-foreach($KEYUSER_CFG->linked_fields as $field_to_remove){
-    $cols_to_remove[] = "profile_field_".$field_to_remove->shortname;
-}
-
 if (empty($iid)) {
     $mform1 = new admin_uploaduser_form1();
 
     if ($formdata = $mform1->get_data()) {
         $iid = keyuser_csv_import_reader::get_new_iid('uploaduser');
         $cir = new keyuser_csv_import_reader($iid, 'uploaduser');
-        $cir->cols_to_remove = $cols_to_remove;
 
         $content = $mform1->get_file_content('userfile');
 
@@ -76,7 +70,6 @@ if (empty($iid)) {
     }
 } else {
     $cir = new keyuser_csv_import_reader($iid, 'uploaduser');
-    $cir->cols_to_remove = $cols_to_remove;
 }
 
 // Test if columns ok.

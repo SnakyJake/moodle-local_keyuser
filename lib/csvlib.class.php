@@ -111,96 +111,16 @@ class keyuser_csv_import_reader extends csv_import_reader {
         $columns = array();
         // str_getcsv doesn't iterate through the csv data properly. It has
         // problems with line returns.
-
-        $num = 0;
-
         while ($fgetdata = fgetcsv($fp, 0, $csv_delimiter, $enclosure)) {
             // Check to see if we have an empty line.
             if (count($fgetdata) == 1) {
                 if ($fgetdata[0] !== null) {
                     // The element has data. Add it to the array.
-                    if(count($this->cols_to_remove)){
-                        //header
-                        if($num == 0){
-                            foreach($fgetdata as $key=>$columnname){
-                                $fgetdata[$key] = core_text::strtolower($columnname);
-                                if(core_text::substr($columnname,0,6) == "cohort"){
-                                    $this->_cohort_col_keys[] = $key;
-                                }
-                            }
-                            foreach($this->cols_to_remove as $col_to_remove){
-                                $key = array_search($col_to_remove, $fgetdata);
-                                if($key !== false){
-                                    $this->cols_to_remove[] = $key;
-                                    unset($fgetdata[$key]);
-                                }
-                            }
-                        } else {
-                            foreach($this->_cohort_col_keys as $key){
-                                if($fgetdata[$key]) {
-                                    //true as second param handles r_ readonly cohorts
-                                    keyuser_cohort_remove_prefix($fgetdata[$key]);
-                                }
-                            }
-                            foreach($this->_cols_to_remove_keys as $key){
-                                unset($fgetdata[$key]);
-                            }
-                        }
-                    }
-                    //check for empty line
-                    $keep = false;
-                    foreach($fgetdata as $value){
-                        if($value){
-                            $keep = true;
-                            break;
-                        }
-                    }
-                    if($keep){
-                        $columns[] = $fgetdata;
-                    }
-                }
-            } else {
-                if(count($this->cols_to_remove)){
-                    //header
-                    if($num == 0){
-                        foreach($fgetdata as $key=>$columnname){
-                            $fgetdata[$key] = core_text::strtolower($columnname);
-                            if(core_text::substr($columnname,0,6) == "cohort"){
-                                $this->_cohort_col_keys[] = $key;
-                            }
-                        }
-                        foreach($this->cols_to_remove as $col_to_remove){
-                            $key = array_search($col_to_remove, $fgetdata);
-                            if($key !== false){
-                                $this->_cols_to_remove_keys[] = $key;
-                                unset($fgetdata[$key]);
-                            }
-                        }
-                    } else {
-                        foreach($this->_cohort_col_keys as $key){
-                            if($fgetdata[$key]) {
-                                //true as second param handles r_ readonly cohorts
-                                keyuser_cohort_remove_prefix($fgetdata[$key]);
-                            }
-                        }
-                        foreach($this->_cols_to_remove_keys as $key){
-                            unset($fgetdata[$key]);
-                        }
-                    }
-                }
-                //check for empty line
-                $keep = false;
-                foreach($fgetdata as $value){
-                    if($value){
-                        $keep = true;
-                        break;
-                    }
-                }
-                if($keep){
                     $columns[] = $fgetdata;
                 }
+            } elseif (array_filter($fgetdata)) {
+                $columns[] = $fgetdata;
             }
-            $num++;
         }
         $col_count = 0;
 
