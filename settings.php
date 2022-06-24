@@ -44,7 +44,7 @@ if ($hassiteconfig){
     $roleurl = $CFG->wwwroot . '/' . $CFG->admin . '/roles/define.php';
 
     $settings = new admin_settingpage('local_keyuser_settings', get_string('settings'));
-    
+
     $settings->add(new admin_setting_heading('local_keyuser/settings',get_string('settings'),''));
 
     //enable empty cohort prefix
@@ -80,7 +80,7 @@ if ($hassiteconfig){
             $settings->hide_if('local_keyuser/cohortprefixfieldsmulti'.$role->id,'local_keyuser/roleenabled'.$role->id);
         }
     }
-    
+
     $settings->add(new admin_setting_heading('local_keyuser/profilefields_link2','', '<a href="' . $CFG->wwwroot. '/user/profile/index.php">' . get_string("edit_profilefields","local_keyuser") . "</a>"));
 
     $ADMIN->add('localkeyuser', $settings);
@@ -89,10 +89,10 @@ if ($hassiteconfig){
     new moodle_url('/local/keyuser/checkmoodlechanges.php')));
 }
 
-if (has_capability('local/keyuser:uploadusers', $systemcontext) 
- or has_capability('local/keyuser:userupdate', $systemcontext) 
- or has_capability('local/keyuser:userdelete', $systemcontext) 
- or has_capability('local/keyuser:usercreate', $systemcontext) 
+if (has_capability('local/keyuser:uploadusers', $systemcontext)
+ or has_capability('local/keyuser:userupdate', $systemcontext)
+ or has_capability('local/keyuser:userdelete', $systemcontext)
+ or has_capability('local/keyuser:usercreate', $systemcontext)
  or has_capability('local/keyuser:userbulkactions', $systemcontext)
  or has_capability('local/keyuser:cohortmanage', $systemcontext)
  or has_capability('local/keyuser:cohortview', $systemcontext)
@@ -119,11 +119,11 @@ if (has_capability('local/keyuser:uploadusers', $systemcontext)
     );
     if(has_capability('local/keyuser:userbulkactions', $systemcontext)){
         $ADMIN->add(
-            'keyusersettings', 
+            'keyusersettings',
             new admin_externalpage(
-                'keyuser_userbulk', 
+                'keyuser_userbulk',
                 new lang_string('userbulk','admin'),
-                new moodle_url('/local/keyuser/admin/user/user_bulk.php'), 
+                new moodle_url('/local/keyuser/admin/user/user_bulk.php'),
                 array('local/keyuser:userupdate','local/keyuser:userdelete','local/keyuser:userbulkactions'),
             )
         );
@@ -138,20 +138,20 @@ if (has_capability('local/keyuser:uploadusers', $systemcontext)
         )
     );
     $ADMIN->add(
-        'keyusersettings', 
+        'keyusersettings',
         new admin_externalpage(
-            'keyuser_cohorts', 
+            'keyuser_cohorts',
             new lang_string('cohorts', 'cohort'),
-            new moodle_url('/local/keyuser/cohort/index.php'), 
-            array('local/keyuser:cohortmanage', 'local/keyuser:cohortview')#
+            new moodle_url('/local/keyuser/cohort/index.php'),
+            array('local/keyuser:cohortmanage', 'local/keyuser:cohortview')
         )
     );
     $ADMIN->add(
-        'keyusersettings', 
+        'keyusersettings',
         new admin_externalpage(
-            'keyuser_uploadusers', 
+            'keyuser_tooluploaduser',
             new lang_string('uploadusers', 'tool_uploaduser'),
-            new moodle_url('/local/keyuser/admin/tool/uploaduser/index.php'), 
+            new moodle_url('/local/keyuser/admin/tool/uploaduser/index.php'),
             array('local/keyuser:uploadusers')
         )
     );

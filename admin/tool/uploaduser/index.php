@@ -24,11 +24,11 @@
  */
 
 require('../../../../../config.php');
-require_once($CFG->dirroot.'/local/keyuser/locallib.php');
 require_once($CFG->libdir.'/adminlib.php');
-require_once($CFG->dirroot.'/local/keyuser/lib/csvlib.class.php');
+require_once($CFG->libdir.'/csvlib.class.php');
 require_once($CFG->dirroot.'/'.$CFG->admin.'/tool/uploaduser/locallib.php');
-require_once($CFG->dirroot.'/local/keyuser/admin/tool/uploaduser/user_form.php');
+require_once($CFG->dirroot.'/local/keyuser/locallib.php');
+require_once($CFG->dirroot.'/local/keyuser/'.$CFG->admin.'/tool/uploaduser/user_form.php');
 
 $iid         = optional_param('iid', '', PARAM_INT);
 $previewrows = optional_param('previewrows', 10, PARAM_INT);
@@ -36,7 +36,7 @@ $previewrows = optional_param('previewrows', 10, PARAM_INT);
 core_php_time_limit::raise(60 * 60); // 1 hour should be enough.
 raise_memory_limit(MEMORY_HUGE);
 
-admin_externalpage_setup('keyuser_uploadusers');
+admin_externalpage_setup('keyuser_tooluploaduser');
 
 $returnurl = new moodle_url('/local/keyuser/admin/tool/uploaduser/index.php');
 $bulknurl  = new moodle_url('/local/keyuser/admin/user/user_bulk.php');
@@ -45,10 +45,13 @@ if (empty($iid)) {
     $mform1 = new admin_uploaduser_form1();
 
     if ($formdata = $mform1->get_data()) {
-        $iid = keyuser_csv_import_reader::get_new_iid('uploaduser');
-        $cir = new keyuser_csv_import_reader($iid, 'uploaduser');
+        $iid = csv_import_reader::get_new_iid('uploaduser');
+        $cir = new csv_import_reader($iid, 'uploaduser');
 
         $content = $mform1->get_file_content('userfile');
+        // Remove lines only filled with delimiters.
+        $delim = csv_import_reader::get_delimiter($formdata->delimiter_name);
+        $content = preg_replace("/^$delim+\\r?$/m", '', $content);
 
         $readcount = $cir->load_csv_content($content, $formdata->encoding, $formdata->delimiter_name);
         $csvloaderror = $cir->get_error();
@@ -69,7 +72,7 @@ if (empty($iid)) {
         die;
     }
 } else {
-    $cir = new keyuser_csv_import_reader($iid, 'uploaduser');
+    $cir = new csv_import_reader($iid, 'uploaduser');
 }
 
 // Test if columns ok.
