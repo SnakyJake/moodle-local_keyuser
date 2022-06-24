@@ -53,6 +53,8 @@ class process extends \tool_uploaduser\process {
 
     /**
      * Prepare one line from CSV file as a user record
+     * Check for corrent linked profile fields
+     * Prepend prefix to cohorts if needed
      *
      * @param array $line
      * @return \stdClass|null
@@ -63,7 +65,7 @@ class process extends \tool_uploaduser\process {
 
         foreach($KEYUSER_CFG->linked_fields as $linked_field) {
             $shortname = $linked_field->shortname;
-            $name = "profile_field_" . $shortname;
+            $name = 'profile_field_' . $shortname;
 
             if (isset($user->$name)) {
                 if ($user->$name != $USER->profile[$shortname]) {
@@ -75,8 +77,8 @@ class process extends \tool_uploaduser\process {
             }
         }
 
-        array_walk($user, 'keyuser_cohort_remove_prefix_by_cohort_key');
-        //$this->upt->track('enrolments', "Prefix removed from '$cohortname'", 'info');
+        array_walk($user, 'keyuser_cohort_add_prefix_by_cohort_key');
+        //$this->upt->track('enrolments', "Prefix added: $cohortname", 'info');
 
         return $user;
     }

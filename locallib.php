@@ -261,8 +261,22 @@ function keyuser_cohort_add_prefix(&$cohortname) {
 }
 
 /**
+ * Prepend prefix to $cohortname if $key has regex pattern "^cohort\d+$"
+ * Prefix always without _r_
+ *
+ * @param string $cohortname
+ * @param string $key
+ */
+function keyuser_cohort_add_prefix_by_cohort_key(&$cohortname, $key) {
+    if (preg_match('/^cohort\d+$/', $key) && !empty($cohortname)) {
+        keyuser_cohort_add_prefix($cohortname);
+    }
+}
+
+/**
  * Remove prefix of $cohortname
  * Prefix may contain _r_
+ * @deprecated
  *
  * @param  string $cohortname
  * @return bool If prefix removed
@@ -273,19 +287,6 @@ function keyuser_cohort_remove_prefix(&$cohortname) {
         return $count;
     }
     return false;
-}
-
-/**
- * Remove prefix of $cohortname if $key is "^cohort\d+$"
- * Prefix may contain _r_
- *
- * @param string $cohortname
- * @param string $key
- */
-function keyuser_cohort_remove_prefix_by_cohort_key(&$cohortname, $key) {
-    if (preg_match('/^cohort\d+$/', $key) && !empty($cohortname)) {
-        keyuser_cohort_remove_prefix($cohortname);
-    }
 }
 
 /**
