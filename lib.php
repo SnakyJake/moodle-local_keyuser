@@ -26,8 +26,8 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot.'/cohort/lib.php');
-require_once($CFG->libdir .'/formslib.php');
-require_once($CFG->dirroot.'/local/keyuser/locallib.php');
+require_once($CFG->libdir.'/formslib.php');
+require_once(__DIR__.'/locallib.php');
 
 MoodleQuickForm::registerElementType('keyusercohort', "$CFG->dirroot/local/keyuser/lib/form/keyusercohort.php", 'MoodleQuickForm_keyusercohort');
 

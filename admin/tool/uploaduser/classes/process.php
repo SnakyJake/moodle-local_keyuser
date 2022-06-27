@@ -82,6 +82,7 @@ class process extends \tool_uploaduser\process {
                 } else {
                     $user->$key = trim($value);
                 }
+            // Check and adjust keyuser cohorts.
             } elseif (preg_match('/^cohort\d+$/', $key)) {
                 if (!$prefix)
                     continue;

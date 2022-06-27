@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/cohort/lib.php');
-require_once($CFG->dirroot . '/local/keyuser/defines.php');
-require_once($CFG->dirroot . '/local/keyuser/locallib.php');
+require_once($CFG->dirroot.'/cohort/lib.php');
+require_once($CFG->dirroot.'/local/keyuser/defines.php');
+require_once($CFG->dirroot.'/local/keyuser/locallib.php');
 
 /**
  * Add new keyuser_cohort.

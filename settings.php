@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot."/local/keyuser/locallib.php");
+require_once($CFG->dirroot.'/local/keyuser/locallib.php');
 
 $systemcontext = context_system::instance();
 
