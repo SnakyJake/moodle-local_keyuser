@@ -30,7 +30,7 @@ require_once(__DIR__ . '/locallib.php');
 /**
  * Return a single keyuser_cohort as an object where the $id and keyuser conditions are met.
  *
- * @param  int $id
+ * @param int $id
  * @return mixed keyuser_cohort
  */
 function keyuser_cohort_get_record($id, $strictness=IGNORE_MISSING) {
@@ -40,21 +40,6 @@ function keyuser_cohort_get_record($id, $strictness=IGNORE_MISSING) {
     $params = array('prefix' => keyuser_cohort_get_prefix(true), 'id' => $id);
 
     return $DB->get_record_sql(SELECT_KEYUSER_COHORT . FROM_KEYUSER_COHORT . $sql, $params, $strictness);
-}
-
-/**
- * Return a single keyuser_cohort as an object where the $idnumber and keyuser conditions are met.
- *
- * @param  string $idnumber
- * @return mixed keyuser_cohort
- */
-function keyuser_cohort_get_record_by_idnumber($idnumber) {
-    global $DB;
-
-    $sql = " HAVING idnumber = :idnumber";
-    $params = array('prefix' => keyuser_cohort_get_prefix(true), 'idnumber' => $idnumber);
-
-    return $DB->get_record_sql(SELECT_KEYUSER_COHORT . FROM_KEYUSER_COHORT . $sql, $params);
 }
 
 /**
@@ -74,8 +59,8 @@ function keyuser_cohort_get_records() {
 /**
  * Get keyuser_cohorts as an array of objects with the given conditions.
  *
- * @param  string $select
- * @param  array $params
+ * @param string $select
+ * @param array $params
  * @return array array of keyuser_cohorts
  */
 function keyuser_cohort_get_records_select($select, $params) {
@@ -89,12 +74,12 @@ function keyuser_cohort_get_records_select($select, $params) {
 /**
  * Test whether a keyuser_cohort exists with given idnumber.
  *
- * @param  string $idnumber
+ * @param string $idnumber
  * @return bool true if a keyuser_cohort with given idnumber exists, else false
  */
 function keyuser_cohort_record_exists($idnumber) {
     global $DB;
 
-    $idnumber = '^' . keyuser_cohort_get_prefix(true) . preg_quote($idnumber) . '$';
+    $idnumber = keyuser_cohort_get_prefix(true).preg_quote($idnumber).'$';
     return $DB->record_exists_select('cohort', 'idnumber REGEXP ?', [$idnumber]);
 }
