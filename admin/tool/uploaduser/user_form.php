@@ -28,7 +28,7 @@ require_once($CFG->dirroot.'/'.$CFG->admin.'/tool/uploaduser/user_form.php');
 
 class keyuser_admin_uploaduser_form2 extends admin_uploaduser_form2 {
     function definition () {
-        global $CFG, $USER, $KEYUSER_CFG;
+        global $CFG, $USER;
 
         $mform   = $this->_form;
         $columns = $this->_customdata['columns'];
@@ -308,12 +308,6 @@ class keyuser_admin_uploaduser_form2 extends admin_uploaduser_form2 {
         // Next the profile defaults
         // dont need this!
         //profile_definition($mform);
-
-        $keyuser_fields = $KEYUSER_CFG->linked_fields;
-        foreach($keyuser_fields as $field){
-            $mform->addElement('hidden', 'profile_field_'.$field->shortname, $USER->profile[$field->shortname]);
-            $mform->setType('profile_field_'.$field->shortname,PARAM_TEXT);
-        }
 
         // hidden fields
         $mform->addElement('hidden', 'iid');

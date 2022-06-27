@@ -196,7 +196,7 @@ function keyuser_user_where(&$params,$usertable=null){
 /**
  * Return prefix of current $USER.
  *
- * @param  bool $regexp
+ * @param bool $regexp
  * @return string prefix of $USER
  */
 function keyuser_cohort_get_prefix($regexp = false){
@@ -230,7 +230,7 @@ function keyuser_cohort_get_prefix($regexp = false){
             //$prefix .= (is_array($fieldvalue)?implode($divider,$fieldvalue):$fieldvalue);
             if (is_array($fieldvalue)) {
                 if ($regexp) {
-                    $fieldvalue = '(' . implode('|', array_map('preg_quote', $fieldvalue)) . ')';
+                    $fieldvalue = '('.implode('|', array_map('preg_quote', $fieldvalue)).')';
                 } else {
                     return '';  // also a false boolean
                 }
@@ -247,13 +247,13 @@ function keyuser_cohort_get_prefix($regexp = false){
  * Prepend prefix to $cohortname
  * Prefix always without _r_
  *
- * @param  string $cohortname
- * @return bool If prefix added
+ * @param string $cohortname
+ * @return bool If $cohortname has prefix now
  */
 function keyuser_cohort_add_prefix(&$cohortname) {
     if ($prefix = keyuser_cohort_get_prefix()) {
         if (substr($cohortname, 0, strlen($prefix)) != $prefix) {
-            $cohortname = $prefix . $cohortname;
+            $cohortname = $prefix.$cohortname;
         }
         return true;
     }
@@ -261,29 +261,16 @@ function keyuser_cohort_add_prefix(&$cohortname) {
 }
 
 /**
- * Prepend prefix to $cohortname if $key has regex pattern "^cohort\d+$"
- * Prefix always without _r_
- *
- * @param string $cohortname
- * @param string $key
- */
-function keyuser_cohort_add_prefix_by_cohort_key(&$cohortname, $key) {
-    if (preg_match('/^cohort\d+$/', $key) && !empty($cohortname)) {
-        keyuser_cohort_add_prefix($cohortname);
-    }
-}
-
-/**
  * Remove prefix of $cohortname
  * Prefix may contain _r_
- * @deprecated
+ * @deprecated Not used anywhere.
  *
- * @param  string $cohortname
+ * @param string $cohortname
  * @return bool If prefix removed
  */
 function keyuser_cohort_remove_prefix(&$cohortname) {
     if ($prefix = keyuser_cohort_get_prefix(true)) {
-        $cohortname = preg_replace('!' . $prefix . '!Ai', '', $cohortname, 1, $count);
+        $cohortname = preg_replace('!'.$prefix.'!Ai', '', $cohortname, 1, $count);
         return $count;
     }
     return false;

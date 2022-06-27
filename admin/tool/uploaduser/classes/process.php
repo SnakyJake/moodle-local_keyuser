@@ -53,23 +53,133 @@ class process extends \tool_uploaduser\process {
 
     /**
      * Prepare one line from CSV file as a user record
-     * Check for corrent linked profile fields
-     * Prepend prefix to cohorts if needed
+     * Check and prepend prefix to keyuser cohorts
+     * Check or set correct linked profile fields
      *
      * @param array $line
      * @return \stdClass|null
      */
     protected function prepare_user_record(array $line): ?\stdClass {
-        global $USER, $KEYUSER_CFG;
-        $user = parent::prepare_user_record($line);
+        global $CFG, $USER, $DB, $KEYUSER_CFG;
 
+        $user = new \stdClass();
+        $prefix = keyuser_cohort_get_prefix(true);
+
+        // Add fields to user object.
+        foreach ($line as $keynum => $value) {
+            if (!isset($this->get_file_columns()[$keynum])) {
+                // This should not happen.
+                continue;
+            }
+            $key = $this->get_file_columns()[$keynum];
+            if (strpos($key, 'profile_field_') === 0) {
+                // NOTE: bloody mega hack alert!!
+                if (isset($USER->$key) and is_array($USER->$key)) {
+                    // This must be some hacky field that is abusing arrays to store content and format.
+                    $user->$key = array();
+                    $user->{$key['text']}   = $value;
+                    $user->{$key['format']} = FORMAT_MOODLE;
+                } else {
+                    $user->$key = trim($value);
+                }
+            } elseif (preg_match('/^cohort\d+$/', $key)) {
+                if (!$prefix)
+                    continue;
+
+                $value = trim($value);
+                if (!empty($value)) {
+                    if (preg_match("!$prefix!Ai", $value, $preg_matches)) {
+                        // We have cohort with real idnumber here - cut prefix
+                        $value = substr($value, strlen($preg_matches[0]));
+                    }
+
+                    // Add regex prefix to idnumber - find existing cohort
+                    $value_regexp = $prefix.preg_quote($value).'$';
+                    $cohort = $DB->get_record_select('cohort', 'idnumber REGEXP ?', [$value_regexp]);
+
+                    if (empty($cohort)) {
+                        // Its a new cohort
+                        if ($preg_matches) {
+                            if(in_array('r_', $preg_matches)) {
+                                $this->upt->track('enrolments', "Can not create readonly cohort '{$preg_matches[0]}$value'", 'warning');
+                                continue;
+                            }
+                        } else {
+                            if (!keyuser_cohort_add_prefix($value) && $KEYUSER_CFG->no_prefix_allowed) {
+                                $this->upt->track('enrolments', "Can not add prefix to '$value'", 'warning');
+                                continue;
+                            }
+                        }
+                    } else {
+                        $value = $cohort->idnumber;
+                    }
+                }
+                $user->$key = $value;
+            } else {
+                $user->$key = trim($value);
+            }
+
+            if (in_array($key, $this->upt->columns)) {
+                // Default value in progress tracking table, can be changed later.
+                $this->upt->track($key, s($value), 'normal');
+            }
+        }
+        if (!isset($user->username)) {
+            // Prevent warnings below.
+            $user->username = '';
+        }
+
+        if ($this->get_operation_type() == UU_USER_ADDNEW or $this->get_operation_type() == UU_USER_ADDINC) {
+            // User creation is a special case - the username may be constructed from templates using firstname and lastname
+            // better never try this in mixed update types.
+            $error = false;
+            if (!isset($user->firstname) or $user->firstname === '') {
+                $this->upt->track('status', get_string('missingfield', 'error', 'firstname'), 'error');
+                $this->upt->track('firstname', get_string('error'), 'error');
+                $error = true;
+            }
+            if (!isset($user->lastname) or $user->lastname === '') {
+                $this->upt->track('status', get_string('missingfield', 'error', 'lastname'), 'error');
+                $this->upt->track('lastname', get_string('error'), 'error');
+                $error = true;
+            }
+            if ($error) {
+                $this->userserrors++;
+                return null;
+            }
+            // We require username too - we might use template for it though.
+            if (empty($user->username) and !empty($this->formdata->username)) {
+                $user->username = uu_process_template($this->formdata->username, $user);
+                $this->upt->track('username', s($user->username));
+            }
+        }
+
+        // Normalize username.
+        $user->originalusername = $user->username;
+        if ($this->get_normalise_user_names()) {
+            $user->username = \core_user::clean_field($user->username, 'username');
+        }
+
+        // Make sure we really have username.
+        if (empty($user->username)) {
+            $this->upt->track('status', get_string('missingfield', 'error', 'username'), 'error');
+            $this->upt->track('username', get_string('error'), 'error');
+            $this->userserrors++;
+            return null;
+        } else if ($user->username === 'guest') {
+            $this->upt->track('status', get_string('guestnoeditprofileother', 'error'), 'error');
+            $this->userserrors++;
+            return null;
+        }
+        // Make sure we have correct linked profile fields.
         foreach($KEYUSER_CFG->linked_fields as $linked_field) {
             $shortname = $linked_field->shortname;
-            $name = 'profile_field_' . $shortname;
+            $name = 'profile_field_'.$shortname;
 
             if (isset($user->$name)) {
                 if ($user->$name != $USER->profile[$shortname]) {
-                    $this->upt->track('status', 'Wrong linked field', 'warning');
+                    $this->upt->track('status', sprintf('%s "%s" is not allowed', $shortname, $user->$name), 'error');
+                    $this->userserrors++;
                     return null;
                 }
             } else {
@@ -77,8 +187,15 @@ class process extends \tool_uploaduser\process {
             }
         }
 
-        array_walk($user, 'keyuser_cohort_add_prefix_by_cohort_key');
-        //$this->upt->track('enrolments', "Prefix added: $cohortname", 'info');
+        if ($user->username !== \core_user::clean_field($user->username, 'username')) {
+            $this->upt->track('status', get_string('invalidusername', 'error', 'username'), 'error');
+            $this->upt->track('username', get_string('error'), 'error');
+            $this->userserrors++;
+        }
+
+        if (empty($user->mnethostid)) {
+            $user->mnethostid = $CFG->mnet_localhost_id;
+        }
 
         return $user;
     }
