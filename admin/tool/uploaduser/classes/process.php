@@ -116,6 +116,8 @@ class process extends \tool_uploaduser\process {
                     }
                 }
                 $user->$key = $value;
+            } elseif (preg_match('/^sysrole\d+$/', $key)) {
+                $this->upt->track('status', "Assigning system role '".trim($value)."' is not allowed", 'warning');
             } else {
                 $user->$key = trim($value);
             }
