@@ -79,7 +79,7 @@ if (empty($iid)) {
 $process = new \local_keyuser\tool_uploaduser\process($cir);
 $filecolumns = $process->get_file_columns();
 
-$mform2 = new keyuser_admin_uploaduser_form2(null,
+$mform2 = new admin_uploaduser_form2(null,
     ['columns' => $filecolumns, 'data' => ['iid' => $iid, 'previewrows' => $previewrows]]);
 
 // If a file has been uploaded, then process it.
