@@ -82,11 +82,10 @@ class process extends \tool_uploaduser\process {
                 } else {
                     $user->$key = trim($value);
                 }
-            // Check and adjust keyuser cohorts.
             } elseif (preg_match('/^cohort\d+$/', $key)) {
                 if (!$prefix)
                     continue;
-
+                // Check and adjust keyuser cohorts.
                 $value = trim($value);
                 if (!empty($value)) {
                     if (preg_match("!$prefix!Ai", $value, $preg_matches)) {
@@ -102,12 +101,14 @@ class process extends \tool_uploaduser\process {
                         // Its a new cohort
                         if ($preg_matches) {
                             if(in_array('r_', $preg_matches)) {
-                                $this->upt->track('enrolments', "Can not create readonly cohort '{$preg_matches[0]}$value'", 'warning');
+                                //$this->upt->track('enrolments', "Can not create readonly cohort '{$preg_matches[0]}$value'", 'warning');
+                                $this->upt->track('enrolments', get_string('csv_readonly_cohort', 'local_keyuser', $preg_matches[0].$value), 'warning');
                                 continue;
                             }
                         } else {
                             if (!keyuser_cohort_add_prefix($value) && $KEYUSER_CFG->no_prefix_allowed) {
-                                $this->upt->track('enrolments', "Can not add prefix to '$value'", 'warning');
+                                //$this->upt->track('enrolments', "Can not add prefix to '$value'", 'warning');
+                                $this->upt->track('enrolments', get_string('csv_prefix_error', 'local_keyuser', $value), 'warning');
                                 continue;
                             }
                         }
@@ -117,7 +118,7 @@ class process extends \tool_uploaduser\process {
                 }
                 $user->$key = $value;
             } elseif (preg_match('/^sysrole\d+$/', $key)) {
-                $this->upt->track('status', "Assigning system role '".trim($value)."' is not allowed", 'warning');
+                $this->upt->track('status', get_string('csv_no_system_role', 'local_keyuser', trim($value)), 'warning');
             } else {
                 $user->$key = trim($value);
             }
@@ -181,7 +182,7 @@ class process extends \tool_uploaduser\process {
 
             if (isset($user->$name)) {
                 if ($user->$name != $USER->profile[$shortname]) {
-                    $this->upt->track('status', sprintf('%s "%s" is not allowed', $shortname, $user->$name), 'error');
+                    $this->upt->track('auth', get_string('csv_wrong_linked_field', 'local_keyuser', ['field' => $shortname, 'value' => $user->$name]), 'error');
                     $this->userserrors++;
                     return null;
                 }

@@ -73,5 +73,10 @@ $string['edit_profilefields'] = "Profilfelder bearbeiten";
 
 $string['error_missing_fields'] = "Diese Aktion kann nicht ausgeführt werden. Es wurden keine Profilfelder verknüpft. Bitte kontaktieren Sie den Administrator!";
 
+$string['csv_readonly_cohort'] = 'Schreibgeschützte globale Gruppe \'{$a}\'';
+$string['csv_prefix_error'] = 'Prefix konnte \'{$a}\' nicht zugefügt werden';
+$string['csv_no_system_role'] = 'Fehler beim Zuweisen der Systemrolle \'{$a}\'';
+$string['csv_wrong_linked_field'] = '{$a->field} \'{$a->value}\' ist ungültig';
+
 $string['emptyname'] =  "--- no name --- Bitte einen Namen vergeben!";
 
