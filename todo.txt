@@ -28,6 +28,8 @@ De-Install: Enrolments nicht löschen, sondern auf Standard-Plugins umstellen (a
 
 17. Excel-Import
 
+18. locallib -> classes
+
 Bugs:
 
 User-Profil immer sichtbar? Oder über Gruppen
