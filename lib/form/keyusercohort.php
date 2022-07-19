@@ -130,7 +130,7 @@ class MoodleQuickForm_keyusercohort extends MoodleQuickForm_autocomplete {
             $this->setSelected($values);
             return true;
         }
-
+        
         list($whereclause, $params) = $DB->get_in_or_equal($cohortstofetch, SQL_PARAMS_NAMED, 'id');
 
         $list = keyuser_cohort_get_records_select('id ' . $whereclause, $params);
