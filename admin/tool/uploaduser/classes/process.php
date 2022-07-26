@@ -38,6 +38,42 @@ require_once($CFG->dirroot.'/local/keyuser/locallib.php');
 class process extends \tool_uploaduser\process {
 
     /**
+     * process constructor.
+     *
+     * @param \csv_import_reader $cir
+     * @param string|null $progresstrackerclass
+     * @throws \coding_exception
+     */
+    public function __construct(\csv_import_reader $cir, string $progresstrackerclass = null) {
+        $this->cir = $cir;
+        if ($progresstrackerclass) {
+            if (!class_exists($progresstrackerclass) || !is_subclass_of($progresstrackerclass, \uu_progress_tracker::class)) {
+                throw new \coding_exception('Progress tracker class must extend \uu_progress_tracker');
+            }
+            $this->progresstrackerclass = $progresstrackerclass;
+        } else {
+            $this->progresstrackerclass = \uu_progress_tracker::class;
+        }
+
+        // Keep timestamp consistent.
+        $today = time();
+        $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
+        $this->today = $today;
+
+        $this->rolecache      = []; // Course roles lookup cache.
+        $this->sysrolecache   = []; // System roles lookup cache.
+        $this->supportedauths = []; // Officially supported plugins that are enabled.
+
+        if (enrol_is_enabled('keyusermanual')) {
+            // We use only manual enrol plugin here, if it is disabled no enrol is done.
+            $this->manualenrol = enrol_get_plugin('keyusermanual');
+        }
+
+        $this->find_profile_fields();
+        $this->find_standard_fields();
+    }
+
+    /**
      * Returns the list of columns in the file
      *
      * @return array
@@ -101,13 +137,11 @@ class process extends \tool_uploaduser\process {
                         // Its a new cohort
                         if ($preg_matches) {
                             if(in_array('r_', $preg_matches)) {
-                                //$this->upt->track('enrolments', "Can not create readonly cohort '{$preg_matches[0]}$value'", 'warning');
                                 $this->upt->track('enrolments', get_string('csv_readonly_cohort', 'local_keyuser', $preg_matches[0].$value), 'warning');
                                 continue;
                             }
                         } else {
                             if (!keyuser_cohort_add_prefix($value) && $KEYUSER_CFG->no_prefix_allowed) {
-                                //$this->upt->track('enrolments', "Can not add prefix to '$value'", 'warning');
                                 $this->upt->track('enrolments', get_string('csv_prefix_error', 'local_keyuser', $value), 'warning');
                                 continue;
                             }
@@ -117,8 +151,6 @@ class process extends \tool_uploaduser\process {
                     }
                 }
                 $user->$key = $value;
-            } elseif (preg_match('/^sysrole\d+$/', $key)) {
-                $this->upt->track('status', get_string('csv_no_system_role', 'local_keyuser', trim($value)), 'warning');
             } else {
                 $user->$key = trim($value);
             }

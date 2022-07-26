@@ -75,7 +75,6 @@ $string['error_missing_fields'] = "This action cannot be executed. No profile fi
 
 $string['csv_readonly_cohort'] = 'Can not create readonly cohort \'{$a}\'';
 $string['csv_prefix_error'] = 'Can not add prefix to \'{$a}\'';
-$string['csv_no_system_role'] = 'Assigning system role \'{$a}\' is not allowed';
 $string['csv_wrong_linked_field'] = '{$a->field} \'{$a->value}\' is not allowed';
 
 $string['emptyname'] =  "--- no name --- please give me a name!";
